@@ -122,7 +122,7 @@ ecom-team-project/
 ## Documentation
 
 - [System Development Lifecycle: Design and Architecture](docs/System-Development-Lifecycle-Design-and-Architecture.docx)
-- Optional CMS version: https://josephineallan369.wixsite.com/packe
+- Optional CMS version: https://josephineallan369.wixsite.com/packe-1
 
 ---
 
