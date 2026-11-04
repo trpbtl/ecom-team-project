@@ -95,8 +95,34 @@ The system has three tiers:
    git clone https://github.com/trpbtl/ecom-team-project.git
    ```
 3. Start **Apache** and **MySQL** from the XAMPP Control Panel.
-4. Create the database in phpMyAdmin (`http://localhost/phpmyadmin`). The schema file will be added as the project develops.
+4. Open phpMyAdmin (`http://localhost/phpmyadmin`) and import `database/schema.sql`.
 5. Open `http://localhost/ecom-team-project` in your browser.
+
+---
+
+## Project Structure
+
+```
+ecom-team-project/
+├── index.php            Homepage
+├── config/db.php        MySQL connection
+├── database/schema.sql  Tables: customers, admins, products, customizations,
+│                        cart, orders, order_items, payments, deliveries
+├── includes/            Shared header and footer
+├── assets/              style.css, script.js
+├── pages/               Customer pages: login, register, catalogue, product,
+│                        customize, preview, cart, checkout, payment, track-order
+├── admin/               Admin dashboard, orders, products, customers, reports
+├── delivery/            Delivery personnel dashboard
+├── controllers/         Application layer: Auth, Product, Customization, Pricing,
+│                        Cart, Payment, Order, Delivery, Admin
+└── docs/                Design and architecture document
+```
+
+## Documentation
+
+- [System Development Lifecycle: Design and Architecture](docs/System-Development-Lifecycle-Design-and-Architecture.docx)
+- Optional CMS version: https://josephineallan369.wixsite.com/packe
 
 ---
 
