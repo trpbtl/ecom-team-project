@@ -1,0 +1,10 @@
+# Uploaded images must never run as code
+<FilesMatch "\.(php|phtml|phar|php[0-9]|html?|svgz?|js)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^(logo|placeholder)\.svg$">
+    Require all granted
+</FilesMatch>
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

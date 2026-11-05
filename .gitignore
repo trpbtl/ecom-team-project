@@ -1,0 +1,12 @@
+# Your own credentials and Paystack keys
+core/local_cred.php
+
+# Logs and uploads
+error/*.log
+images/products/*
+!images/products/.gitkeep
+images/designs/*
+!images/designs/.gitkeep
+
+.DS_Store
+Thumbs.db
