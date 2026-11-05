@@ -9,29 +9,35 @@ class Database
     protected mysqli $conn;
     private static ?mysqli $shared = null;   // one connection per request
 
+    /** Open a connection (with SSL for Aiven). $dbName null = no database selected (used by setup.php). */
+    public static function open(?string $dbName): mysqli
+    {
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        $conn = mysqli_init();
+        $flags = 0;
+        if (DB_SSL) {
+            $caFile = null;
+            if (DB_SSL_CA !== '') {
+                // The certificate comes in as text (an environment variable); mysqli needs it as a file
+                $caFile = sys_get_temp_dir() . '/packe-db-ca-' . md5(DB_SSL_CA) . '.pem';
+                if (!is_file($caFile)) {
+                    file_put_contents($caFile, str_replace('\n', "\n", DB_SSL_CA));
+                }
+            }
+            $conn->ssl_set(null, null, $caFile, null, null);
+            // With the CA we verify the server; without it the link is still encrypted but not verified
+            $flags = MYSQLI_CLIENT_SSL | ($caFile ? 0 : MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT);
+        }
+        $conn->real_connect(DB_HOST, DB_USER, DB_PASS, $dbName, DB_PORT, null, $flags);
+        $conn->set_charset('utf8mb4');
+        return $conn;
+    }
+
     public function __construct()
     {
         if (self::$shared === null) {
-            mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
             try {
-                $conn = mysqli_init();
-                $flags = 0;
-                if (DB_SSL) {
-                    $caFile = null;
-                    if (DB_SSL_CA !== '') {
-                        // The certificate comes in as text (an environment variable); mysqli needs it as a file
-                        $caFile = sys_get_temp_dir() . '/packe-db-ca-' . md5(DB_SSL_CA) . '.pem';
-                        if (!is_file($caFile)) {
-                            file_put_contents($caFile, str_replace('\n', "\n", DB_SSL_CA));
-                        }
-                    }
-                    $conn->ssl_set(null, null, $caFile, null, null);
-                    // With the CA we verify the server; without it the link is still encrypted but not verified
-                    $flags = MYSQLI_CLIENT_SSL | ($caFile ? 0 : MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT);
-                }
-                $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
-                $conn->set_charset('utf8mb4');
-                self::$shared = $conn;
+                self::$shared = self::open(DB_NAME);
             } catch (mysqli_sql_exception $e) {
                 error_log('DB connection failed: ' . $e->getMessage());
                 http_response_code(500);
