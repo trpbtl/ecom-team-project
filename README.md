@@ -110,13 +110,20 @@ How a payment is checked (`actions/process_payment_action.php` → `OrderControl
 
 ## Put it online for free (Render + Aiven)
 
-1. **Database:** create a free **MySQL** service on [Aiven](https://aiven.io/free-tier). Import `database/packe.sql` without its `CREATE DATABASE` and `USE` lines (Aiven gives you a database called `defaultdb`).
-2. **Web app:** on [Render](https://render.com), choose **New → Blueprint**, select this repository, and Render reads `render.yaml`. It builds from the `Dockerfile`.
-3. In Render, fill in the environment variables:
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`: from Aiven
+1. **Database:** create a free **MySQL** service on [Aiven](https://aiven.io/free-tier). From its overview page, note the host, port, user and password, and download the **CA certificate** (`ca.pem`).
+2. **Import the data** from a computer with XAMPP (it creates the `packe` database):
+   ```bash
+   C:\xampp\mysql\bin\mysql.exe -h YOUR-AIVEN-HOST -P YOUR-PORT -u avnadmin -p --ssl < database\packe.sql
+   ```
+   Type the Aiven password when asked.
+3. **Web app:** on [Render](https://render.com), choose **New → Blueprint**, select this repository, and Render reads `render.yaml`. It builds from the `Dockerfile`.
+4. In Render, fill in the environment variables:
+   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`: from Aiven
+   - `DB_NAME`: `packe`
    - `DB_SSL`: `true`
+   - `DB_SSL_CA`: open `ca.pem` in Notepad and paste its whole text
    - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
-4. Open the `onrender.com` address Render gives you.
+5. Open the `onrender.com` address Render gives you.
 
 Notes on the free plans:
 - Render's free service **sleeps after 15 minutes** without visits, and the first visit after that takes about a minute. Open the site a minute before a demo.

@@ -23,6 +23,7 @@ define('DB_USER', cfg('DB_USER', 'root'));
 define('DB_PASS', cfg('DB_PASS', ''));
 define('DB_NAME', cfg('DB_NAME', 'packe'));
 define('DB_SSL',  cfg('DB_SSL', 'false') === 'true');     // Aiven needs SSL: set DB_SSL=true
+define('DB_SSL_CA', cfg('DB_SSL_CA'));                     // Aiven's CA certificate (the text of ca.pem), so the connection is verified
 
 define('PAYSTACK_PUBLIC_KEY', cfg('PAYSTACK_PUBLIC_KEY'));   // pk_test_...
 define('PAYSTACK_SECRET_KEY', cfg('PAYSTACK_SECRET_KEY'));   // sk_test_...

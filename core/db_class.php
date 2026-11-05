@@ -17,8 +17,17 @@ class Database
                 $conn = mysqli_init();
                 $flags = 0;
                 if (DB_SSL) {
-                    $conn->ssl_set(null, null, null, null, null);
-                    $flags = MYSQLI_CLIENT_SSL;
+                    $caFile = null;
+                    if (DB_SSL_CA !== '') {
+                        // The certificate comes in as text (an environment variable); mysqli needs it as a file
+                        $caFile = sys_get_temp_dir() . '/packe-db-ca-' . md5(DB_SSL_CA) . '.pem';
+                        if (!is_file($caFile)) {
+                            file_put_contents($caFile, str_replace('\n', "\n", DB_SSL_CA));
+                        }
+                    }
+                    $conn->ssl_set(null, null, $caFile, null, null);
+                    // With the CA we verify the server; without it the link is still encrypted but not verified
+                    $flags = MYSQLI_CLIENT_SSL | ($caFile ? 0 : MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT);
                 }
                 $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
                 $conn->set_charset('utf8mb4');
