@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Orange custom mailer box printed with a brand name">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="215" cy="214" rx="150" ry="34" fill="#000" opacity=".16" filter="url(#soft)"/>
+  <!-- left face -->
+  <polygon points="200,235 105,180 105,135 200,190" fill="#b23a10"/>
+  <!-- right face -->
+  <polygon points="200,235 330,160 330,115 200,190" fill="#d14615"/>
+  <!-- top -->
+  <polygon points="200,190 330,115 235,60 105,135" fill="#e4572e"/>
+  <!-- lid front lip -->
+  <polygon points="200,190 330,115 330,124 200,199" fill="#c4410f"/>
+  <polygon points="200,190 105,135 105,144 200,199" fill="#9c330e"/>
+  <!-- tuck slots -->
+  <line x1="200" y1="199" x2="200" y2="235" stroke="#9c330e" stroke-width="1.5" opacity=".5"/>
+  <!-- printed brand on the lid -->
+  <g transform="matrix(0.866,-0.5,0.866,0.5,217,124)" fill="#fff">
+    <text x="0" y="-4" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="18" text-anchor="middle">YOUR BRAND</text>
+    <text x="0" y="12" font-family="Arial, sans-serif" font-size="7" letter-spacing="2" text-anchor="middle" opacity=".85">THANK YOU FOR ORDERING</text>
+  </g>
+  <!-- small logo mark on the front -->
+  <g transform="matrix(0.866,-0.5,0,1,262,182)">
+    <circle cx="0" cy="0" r="9" fill="none" stroke="#fff" stroke-width="2.5" opacity=".9"/>
+    <circle cx="0" cy="0" r="3" fill="#fff" opacity=".9"/>
+  </g>
+</svg>

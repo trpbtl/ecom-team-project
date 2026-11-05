@@ -64,9 +64,19 @@ function money($amount): string
     return 'GH₵' . number_format((float) $amount, 2);
 }
 
+/**
+ * Product pictures: "catalog/<name>.svg" are Packe's own illustrations shipped with the code;
+ * anything else is an image an admin uploaded to images/products/.
+ */
 function product_image_url(?string $file): string
 {
-    return $file ? url('images/products/' . rawurlencode($file)) : url('images/placeholder.svg');
+    if (!$file) {
+        return url('images/placeholder.svg');
+    }
+    if (preg_match('#^catalog/[a-z0-9-]+\.svg$#', $file)) {
+        return url('images/' . $file);
+    }
+    return url('images/products/' . rawurlencode(basename($file)));
 }
 
 /* ---------- Flash messages ($_SESSION['error'] / $_SESSION['success']) ---------- */

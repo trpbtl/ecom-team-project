@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Round branded product stickers in three colours">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-opacity=".2"/></filter>
+    <path id="arcA" d="M -42 0 A 42 42 0 0 1 42 0"/>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- navy sticker -->
+  <g transform="translate(118 168) rotate(-12)" filter="url(#shadow)">
+    <circle r="62" fill="#fbf9f4"/><circle r="56" fill="#1f4e79"/>
+    <circle r="40" fill="none" stroke="#fbf9f4" stroke-width="1.5" stroke-dasharray="3 4"/>
+    <text y="-8" font-family="Arial Black, Arial, sans-serif" font-size="16" font-weight="900" fill="#fbf9f4" text-anchor="middle">SHEA</text>
+    <text y="12" font-family="Arial, sans-serif" font-size="9" letter-spacing="2" fill="#fbf9f4" text-anchor="middle">NATURAL</text>
+  </g>
+  <!-- green sticker -->
+  <g transform="translate(290 112) rotate(10)" filter="url(#shadow)">
+    <circle r="54" fill="#fbf9f4"/><circle r="48" fill="#2f6b3a"/>
+    <path d="M -12 10 C -18 -10 0 -24 16 -18 C 16 2 2 14 -12 10 Z" fill="#cfe8c4"/>
+    <path d="M -12 10 L 10 -12" stroke="#2f6b3a" stroke-width="2"/>
+    <text y="34" font-family="Arial, sans-serif" font-size="8" letter-spacing="2" fill="#fbf9f4" text-anchor="middle">ORGANIC</text>
+  </g>
+  <!-- orange sticker, front -->
+  <g transform="translate(232 196) rotate(-4)" filter="url(#shadow)">
+    <circle r="66" fill="#fbf9f4"/><circle r="60" fill="#d14615"/>
+    <text y="-4" font-family="Georgia, serif" font-size="24" font-style="italic" font-weight="700" fill="#fbf9f4" text-anchor="middle">Thank you</text>
+    <text y="18" font-family="Arial, sans-serif" font-size="9" letter-spacing="3" fill="#fbf9f4" text-anchor="middle">FOR SHOPPING LOCAL</text>
+    <!-- peeling edge -->
+    <path d="M 40 44 Q 58 30 62 22 L 66 0 Q 66 30 40 44 Z" fill="#f0ece4"/>
+  </g>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Kraft stand-up pouch with a clear window showing coffee beans">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter>
+    <linearGradient id="kraft" x1="0" x2="1"><stop offset="0" stop-color="#b98e5d"/><stop offset=".35" stop-color="#d4ae80"/><stop offset=".7" stop-color="#c79c6b"/><stop offset="1" stop-color="#a87d4f"/></linearGradient>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>
+    <clipPath id="win"><rect x="163" y="128" width="74" height="70" rx="10"/></clipPath>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="200" cy="262" rx="85" ry="14" fill="#000" opacity=".2" filter="url(#soft)"/>
+  <!-- pouch body -->
+  <path d="M138 52 H262 L268 236 Q268 260 248 262 H152 Q132 260 132 236 Z" fill="url(#kraft)"/>
+  <!-- heat seal top and zip line -->
+  <rect x="138" y="52" width="124" height="14" fill="#a87d4f" opacity=".45"/>
+  <line x1="139" y1="78" x2="261" y2="78" stroke="#8a6238" stroke-width="2" stroke-dasharray="4 3" opacity=".6"/>
+  <!-- tear notches -->
+  <path d="M138 70 l6 3 l-6 3 Z M262 70 l-6 3 l6 3 Z" fill="#ede4d6"/>
+  <!-- brand label -->
+  <rect x="160" y="88" width="80" height="30" rx="4" fill="#1c1a18"/>
+  <text x="200" y="108" font-family="Arial Black, Arial, sans-serif" font-size="13" font-weight="900" fill="#fbf9f4" text-anchor="middle">KOFI BREW</text>
+  <!-- window with beans -->
+  <g clip-path="url(#win)">
+    <rect x="163" y="128" width="74" height="70" fill="#4a2c17"/>
+    <g fill="#6b3f21" stroke="#2e1a0c" stroke-width="1">
+      <ellipse cx="175" cy="140" rx="8" ry="5.5" transform="rotate(-20 175 140)"/><ellipse cx="195" cy="136" rx="8" ry="5.5" transform="rotate(25 195 136)"/>
+      <ellipse cx="217" cy="141" rx="8" ry="5.5" transform="rotate(-35 217 141)"/><ellipse cx="231" cy="152" rx="8" ry="5.5" transform="rotate(15 231 152)"/>
+      <ellipse cx="183" cy="156" rx="8" ry="5.5" transform="rotate(40 183 156)"/><ellipse cx="205" cy="158" rx="8" ry="5.5" transform="rotate(-10 205 158)"/>
+      <ellipse cx="170" cy="174" rx="8" ry="5.5" transform="rotate(10 170 174)"/><ellipse cx="192" cy="177" rx="8" ry="5.5" transform="rotate(-40 192 177)"/>
+      <ellipse cx="214" cy="178" rx="8" ry="5.5" transform="rotate(30 214 178)"/><ellipse cx="232" cy="172" rx="8" ry="5.5" transform="rotate(-15 232 172)"/>
+      <ellipse cx="180" cy="194" rx="8" ry="5.5" transform="rotate(5 180 194)"/><ellipse cx="203" cy="196" rx="8" ry="5.5" transform="rotate(35 203 196)"/><ellipse cx="226" cy="193" rx="8" ry="5.5" transform="rotate(-25 226 193)"/>
+    </g>
+    <rect x="163" y="128" width="74" height="70" fill="url(#glass)"/>
+  </g>
+  <rect x="163" y="128" width="74" height="70" rx="10" fill="none" stroke="#fbf9f4" stroke-width="2" opacity=".6"/>
+  <text x="200" y="222" font-family="Arial, sans-serif" font-size="9" letter-spacing="2" fill="#5c3d1e" text-anchor="middle">GHANA ROAST · 250 g</text>
+  <!-- side shading -->
+  <path d="M132 236 Q132 260 152 262 H160 L150 52 H138 Z" fill="#000" opacity=".08"/>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Printed rectangular address label with a barcode, peeling from its sheet">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity=".18"/></filter>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- label sheet behind -->
+  <g transform="rotate(6 200 150)" filter="url(#shadow)">
+    <rect x="70" y="52" width="260" height="190" rx="6" fill="#f0ece4"/>
+    <rect x="86" y="196" width="108" height="34" rx="3" fill="#fbf9f4" stroke="#e1dbd0"/>
+    <rect x="206" y="196" width="108" height="34" rx="3" fill="#fbf9f4" stroke="#e1dbd0"/>
+  </g>
+  <!-- the label -->
+  <g transform="rotate(-5 200 140)" filter="url(#shadow)">
+    <rect x="96" y="70" width="210" height="128" rx="6" fill="#fffdf9"/>
+    <rect x="96" y="70" width="210" height="26" rx="6" fill="#c2410c"/>
+    <rect x="96" y="88" width="210" height="8" fill="#c2410c"/>
+    <text x="110" y="88" font-family="Arial Black, Arial, sans-serif" font-size="12" font-weight="900" fill="#fff">SHIP TO</text>
+    <text x="292" y="88" font-family="Arial, sans-serif" font-size="9" fill="#fff" text-anchor="end" opacity=".85">EXPRESS</text>
+    <text x="110" y="116" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#1c1a18">Akosua Boateng</text>
+    <text x="110" y="132" font-family="Arial, sans-serif" font-size="10" fill="#4a4540">14 Liberation Road, Airport</text>
+    <text x="110" y="146" font-family="Arial, sans-serif" font-size="10" fill="#4a4540">Accra, Greater Accra</text>
+    <text x="110" y="160" font-family="Arial, sans-serif" font-size="10" fill="#4a4540">024 000 0000</text>
+    <g fill="#1c1a18">
+      <rect x="110" y="170" width="2" height="18"/><rect x="114" y="170" width="1" height="18"/><rect x="117" y="170" width="3" height="18"/><rect x="122" y="170" width="1" height="18"/><rect x="125" y="170" width="2" height="18"/><rect x="129" y="170" width="1" height="18"/><rect x="132" y="170" width="3" height="18"/><rect x="137" y="170" width="2" height="18"/><rect x="141" y="170" width="1" height="18"/><rect x="144" y="170" width="3" height="18"/><rect x="149" y="170" width="1" height="18"/><rect x="152" y="170" width="2" height="18"/><rect x="156" y="170" width="3" height="18"/><rect x="161" y="170" width="1" height="18"/><rect x="164" y="170" width="2" height="18"/>
+    </g>
+    <rect x="236" y="112" width="56" height="56" rx="4" fill="none" stroke="#1c1a18" stroke-width="2"/>
+    <text x="264" y="146" font-family="Arial Black, Arial, sans-serif" font-size="18" font-weight="900" fill="#1c1a18" text-anchor="middle">ACC</text>
+    <!-- peeled corner -->
+    <path d="M306 176 L306 198 Q306 198 284 198 Z" fill="#e1dbd0"/>
+    <path d="M306 176 L284 198 Q296 186 306 176 Z" fill="#fbf9f4" stroke="#e1dbd0"/>
+  </g>
+</svg>

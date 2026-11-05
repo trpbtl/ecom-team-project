@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="White apparel box with a black lid and gold logo">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+    <linearGradient id="gold" x1="0" x2="1"><stop offset="0" stop-color="#c9a24a"/><stop offset=".5" stop-color="#f1d98a"/><stop offset="1" stop-color="#b8892f"/></linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="205" cy="222" rx="160" ry="32" fill="#000" opacity=".16" filter="url(#soft)"/>
+  <!-- base (white) -->
+  <polygon points="200,240 80,171 80,131 200,200" fill="#dcd7cf"/>
+  <polygon points="200,240 340,159 340,119 200,200" fill="#f4f2ee"/>
+  <!-- lid sides (black) -->
+  <polygon points="200,200 80,131 80,111 200,180" fill="#151311"/>
+  <polygon points="200,200 340,119 340,99 200,180" fill="#2a2622"/>
+  <!-- lid top -->
+  <polygon points="200,180 340,99 220,30 80,111" fill="#1c1a18"/>
+  <!-- gold ribbon and logo on the lid -->
+  <g transform="matrix(0.866,-0.5,0.866,0.5,210,105)">
+    <rect x="-80" y="-4" width="160" height="8" fill="url(#gold)" opacity=".95"/>
+    <circle cx="0" cy="0" r="18" fill="#1c1a18" stroke="url(#gold)" stroke-width="2"/>
+    <text x="0" y="5" font-family="Georgia, serif" font-size="15" font-style="italic" fill="url(#gold)" text-anchor="middle">B</text>
+  </g>
+</svg>
