@@ -1,0 +1,4 @@
+.git
+core/local_cred.php
+error/*.log
+docs
