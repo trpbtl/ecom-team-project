@@ -1,0 +1,8 @@
+# No folder listings
+Options -Indexes
+
+# Code, config, SQL and logs are only included by PHP, never opened in the browser
+RedirectMatch 403 /(core|classes|controllers|database|error|docker)(/|$)
+<FilesMatch "\.(sql|log|md|sh|ini)$|^Dockerfile$|^render\.yaml$">
+    Require all denied
+</FilesMatch>

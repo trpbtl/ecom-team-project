@@ -1,42 +1,54 @@
 <?php
 /**
- * DeliveryController
- * Layer: Application | Owner: Eyram Awoye
- * Calculates delivery charges and manages delivery assignments and tracking.
+ * Controller: delivery assignment and tracking.
+ * Owner: Eyram Awoye
  */
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../classes/DeliveryClass.php';
+require_once __DIR__ . '/../classes/CustomerClass.php';
+require_once __DIR__ . '/Validate.php';
 
 class DeliveryController
 {
-    private PDO $db;
+    private DeliveryClass $model;
 
     public function __construct()
     {
-        $this->db = getDB();
+        $this->model = new DeliveryClass();
     }
 
-    public function calculateFee()
+    public function assign($orderId, $staffId): array
     {
-        // TODO
+        $orderId = Validate::positiveInt($orderId);
+        $staffId = Validate::positiveInt($staffId);
+        $staff = $staffId ? (new CustomerClass())->getCustomerById($staffId) : null;
+        if (!$orderId) return Validate::fail('That order was not found.');
+        if (!$staff || (int) $staff['user_role'] !== 3) return Validate::fail('Choose a delivery staff member.');
+        $this->model->assignDelivery($orderId, $staffId);
+        return ['success' => true, 'name' => $staff['full_name']];
     }
 
-    public function create()
+    public function getDeliveriesForStaff(int $staffId): array
     {
-        // TODO
+        return $this->model->getDeliveriesForStaff($staffId);
     }
 
-    public function assign()
+    /** Delivery staff can only update deliveries assigned to them; admins can update any. */
+    public function updateStatus($deliveryId, string $status, int $userId, bool $isAdmin): array
     {
-        // TODO
+        $deliveryId = Validate::positiveInt($deliveryId);
+        $d = $deliveryId ? $this->model->getDeliveryById($deliveryId) : null;
+        if (!$d || (!$isAdmin && (int) $d['assigned_to'] !== $userId)) return Validate::fail('That delivery was not found.');
+        return $this->model->updateStatus($deliveryId, $status)
+            ? ['success' => true] : Validate::fail('Choose a valid delivery status.');
     }
 
-    public function updateStatus()
+    public static function statuses(): array
     {
-        // TODO
+        return DeliveryClass::STATUSES;
     }
 
-    public function getAssigned()
+    public static function statusLabel(string $status): string
     {
-        // TODO
+        return ucfirst(str_replace('_', ' ', $status));
     }
 }

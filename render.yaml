@@ -1,0 +1,25 @@
+# Render blueprint: one free web service built from the Dockerfile.
+# Secret values are entered in the Render dashboard (sync: false), never stored here.
+services:
+  - type: web
+    name: packe
+    runtime: docker
+    plan: free
+    branch: main
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_SSL
+        value: "true"
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
