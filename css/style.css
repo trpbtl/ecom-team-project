@@ -1,0 +1,67 @@
+/* Packe shared components. Layout and spacing use Tailwind classes in the views; these are the reusable pieces. */
+:root {
+  --packe: #c2410c;
+  --packe-dark: #9a330a;
+  --ink: #1c1a18;
+  --cream: #fbf9f4;
+  --sand: #f3ede3;
+  --line: #e6dfd3;
+  --muted: #6b635a;
+}
+
+[hidden] { display: none !important; }   /* so the hidden attribute beats Tailwind's display classes */
+h1, h2, h3 { text-wrap: balance; }
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  padding: .65rem 1.1rem; border-radius: .75rem; font-weight: 700; font-size: .95rem;
+  border: 1.5px solid transparent; cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+  text-align: center; white-space: nowrap;
+}
+.btn-primary { background: var(--packe); color: #fff; }
+.btn-primary:hover { background: var(--packe-dark); }
+.btn-dark { background: var(--ink); color: var(--cream); }
+.btn-dark:hover { background: #000; }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--ink); }
+.btn-danger { background: #b42318; color: #fff; }
+.btn-danger:hover { background: #8f1c13; }
+.btn[disabled], .btn.is-loading { opacity: .6; cursor: progress; }
+
+.input, select.input, textarea.input {
+  width: 100%; background: #fff; border: 1.5px solid var(--line); border-radius: .7rem;
+  padding: .6rem .8rem; font-size: .95rem; color: var(--ink);
+}
+.input:focus { outline: none; border-color: var(--packe); box-shadow: 0 0 0 3px rgba(194, 65, 12, .15); }
+.input.is-invalid { border-color: #b42318; }
+.field { display: flex; flex-direction: column; gap: .35rem; }
+.field > span:first-child { font-size: .9rem; font-weight: 500; }
+.field-error { color: #b42318; font-size: .82rem; min-height: 1em; }
+
+.card { background: #fff; border: 1px solid var(--line); border-radius: 1rem; }
+.label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .8rem; border-radius: .7rem;
+  border: 1.5px solid var(--line); background: #fff; font-size: .9rem;
+}
+.chip:hover { border-color: var(--ink); }
+.chip-active { border-color: var(--packe); box-shadow: inset 0 0 0 1px var(--packe); color: var(--packe-dark); font-weight: 600; }
+
+.alert { border-radius: .8rem; padding: .8rem 1rem; font-size: .95rem; margin-bottom: .5rem; }
+.alert-success { background: #ecf7ee; color: #1d5b2c; border: 1px solid #bfe3c6; }
+.alert-error { background: #fdeeee; color: #8f1c13; border: 1px solid #f4c4c0; }
+
+.badge { display: inline-block; padding: .25rem .6rem; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+/* Status colours also carry the status name in text */
+.status-paid, .status-pending       { background: #fff4d6; color: #7a5300; }
+.status-processing, .status-assigned { background: #e7efff; color: #1d3f8f; }
+.status-ready                        { background: #efe7ff; color: #4b2a8f; }
+.status-out_for_delivery, .status-in_transit { background: #fde7dc; color: #9a330a; }
+.status-delivered                    { background: #e3f4e6; color: #1d5b2c; }
+.status-cancelled                    { background: #eeeeee; color: #555; }
+
+table th { font-weight: 600; }
+:focus-visible { outline: 2px solid var(--packe); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
