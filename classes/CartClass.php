@@ -45,7 +45,8 @@ class CartClass extends Database
 
     public function getCartCount(string $cartKey): int
     {
-        $row = $this->fetchOne('SELECT COALESCE(SUM(quantity), 0) AS n FROM cart WHERE cart_key = ?', 's', [$cartKey]);
+        // Number of lines in the cart (a design of 250 boxes counts as one item)
+        $row = $this->fetchOne('SELECT COUNT(*) AS n FROM cart WHERE cart_key = ?', 's', [$cartKey]);
         return (int) $row['n'];
     }
 
