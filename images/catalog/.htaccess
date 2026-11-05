@@ -1,0 +1,4 @@
+# Packe's own product illustrations (shipped with the code, not uploaded): SVG is allowed here
+<FilesMatch "\.svg$">
+    Require all granted
+</FilesMatch>

@@ -33,7 +33,10 @@ class ProductClass extends Database
     public function getAllCategories(): array
     {
         return $this->fetchAll(
-            'SELECT c.*, COUNT(p.product_id) AS product_count
+            'SELECT c.*, COUNT(p.product_id) AS product_count,
+                    (SELECT p2.image FROM products p2
+                     WHERE p2.category_id = c.category_id AND p2.image IS NOT NULL
+                     ORDER BY p2.is_customizable DESC, p2.base_price ASC LIMIT 1) AS cover_image
              FROM categories c LEFT JOIN products p ON p.category_id = c.category_id
              GROUP BY c.category_id ORDER BY c.category_name ASC'
         );

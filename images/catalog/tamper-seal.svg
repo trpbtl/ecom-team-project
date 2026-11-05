@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Tamper evident seal sticker across the lid of a kraft box">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+    <pattern id="void" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#e4572e"/><rect width="7" height="14" fill="#d14615"/></pattern>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="205" cy="232" rx="150" ry="30" fill="#000" opacity=".16" filter="url(#soft)"/>
+  <!-- kraft box with lid seam -->
+  <polygon points="200,250 90,186 90,126 200,190" fill="#a87d4f"/>
+  <polygon points="200,250 320,180 320,120 200,190" fill="#c79c6b"/>
+  <polygon points="200,190 320,120 210,56 90,126" fill="#d9b88f"/>
+  <line x1="200" y1="190" x2="320" y2="120" stroke="#8a6238" stroke-width="2"/>
+  <line x1="200" y1="203" x2="320" y2="133" stroke="#8a6238" stroke-width="1.5" opacity=".6"/>
+  <!-- seal running over the edge: on the top -->
+  <g transform="matrix(0.866,-0.5,0.866,0.5,243,152)">
+    <rect x="-16" y="-34" width="32" height="34" fill="url(#void)"/>
+  </g>
+  <!-- and down the front -->
+  <g transform="matrix(0.866,-0.5,0,1,229,174)">
+    <rect x="0" y="0" width="32" height="40" fill="url(#void)"/>
+    <text x="16" y="24" font-family="Arial Black, Arial, sans-serif" font-size="8" font-weight="900" fill="#fff" text-anchor="middle">SEALED</text>
+  </g>
+  <!-- a spare seal on its backing -->
+  <g transform="rotate(-8 330 238)">
+    <rect x="292" y="222" width="80" height="34" rx="4" fill="#fbf9f4" stroke="#e6dfd3"/>
+    <rect x="298" y="228" width="68" height="22" rx="3" fill="url(#void)"/>
+    <text x="332" y="243" font-family="Arial Black, Arial, sans-serif" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">SEALED</text>
+  </g>
+</svg>

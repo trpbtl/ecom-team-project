@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Tri-fold marketing brochure standing partly open">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="200" cy="250" rx="160" ry="22" fill="#000" opacity=".16" filter="url(#soft)"/>
+  <!-- panel 1 (left, angled away) -->
+  <polygon points="70,226 150,250 150,58 70,40" fill="#e9e3d8"/>
+  <!-- panel 2 (middle, facing) -->
+  <polygon points="150,250 250,226 250,40 150,58" fill="#fbf9f4"/>
+  <!-- panel 3 (right, angled toward) -->
+  <polygon points="250,226 330,250 330,58 250,40" fill="#f2ede4"/>
+  <!-- left panel content -->
+  <polygon points="80,60 140,74 140,140 80,128" fill="#2f6b3a" opacity=".85"/>
+  <g fill="#9c958b"><polygon points="80,146 140,158 140,162 80,150"/><polygon points="80,158 140,170 140,174 80,162"/><polygon points="80,170 130,180 130,184 80,174"/></g>
+  <!-- middle panel content -->
+  <polygon points="160,70 240,54 240,120 160,136" fill="#d14615"/>
+  <text x="200" y="104" font-family="Arial Black, Arial, sans-serif" font-size="15" font-weight="900" fill="#fbf9f4" text-anchor="middle" transform="skewY(-11) translate(0 39)">GRAND</text>
+  <text x="200" y="122" font-family="Arial Black, Arial, sans-serif" font-size="15" font-weight="900" fill="#fbf9f4" text-anchor="middle" transform="skewY(-11) translate(0 39)">OPENING</text>
+  <g fill="#9c958b"><polygon points="160,148 240,132 240,136 160,152"/><polygon points="160,160 240,144 240,148 160,164"/><polygon points="160,172 220,160 220,164 160,176"/></g>
+  <polygon points="160,196 210,186 210,204 160,214" fill="#1c1a18"/>
+  <!-- right panel content -->
+  <circle cx="290" cy="96" r="22" fill="#f6c453"/>
+  <g fill="#9c958b"><polygon points="262,138 320,152 320,156 262,142"/><polygon points="262,150 320,164 320,168 262,154"/><polygon points="262,162 310,174 310,178 262,166"/></g>
+  <!-- fold shading -->
+  <polygon points="150,250 158,248 158,57 150,58" fill="#000" opacity=".06"/>
+  <polygon points="250,226 258,228 258,42 250,40" fill="#000" opacity=".05"/>
+</svg>
