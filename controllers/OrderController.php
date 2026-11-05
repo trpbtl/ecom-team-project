@@ -47,15 +47,25 @@ class OrderController
             log_error('PAYSTACK_SECRET_KEY is not set.');
             return null;
         }
-        $ch = curl_init('https://api.paystack.co/transaction/verify/' . rawurlencode($reference));
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . PAYSTACK_SECRET_KEY],
-            CURLOPT_TIMEOUT        => 20,
-        ]);
-        $body = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
+        $url = 'https://api.paystack.co/transaction/verify/' . rawurlencode($reference);
+        $auth = 'Authorization: Bearer ' . PAYSTACK_SECRET_KEY;
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER     => [$auth],
+                CURLOPT_TIMEOUT        => 20,
+            ]);
+            $body = curl_exec($ch);
+            $err = curl_error($ch);
+            curl_close($ch);
+        } else {
+            // Some XAMPP setups load PHP without the curl extension; PHP's own HTTPS streams work too
+            $body = @file_get_contents($url, false, stream_context_create([
+                'http' => ['method' => 'GET', 'header' => $auth, 'timeout' => 20, 'ignore_errors' => true],
+            ]));
+            $err = $body === false ? (error_get_last()['message'] ?? 'request failed') : '';
+        }
         if ($body === false) {
             log_error('Paystack verify failed: ' . $err);
             return null;

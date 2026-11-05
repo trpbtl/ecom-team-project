@@ -96,7 +96,9 @@ Log out and in again for the new role to apply.
 1. Create a free Paystack account with **Ghana** as the country.
 2. In **Settings → API Keys & Webhooks**, stay in **Test mode** and copy the `pk_test_…` and `sk_test_…` keys.
 3. Put them in `core/local_cred.php` (locally) or in Render's environment variables (online).
-4. At payment, use Paystack's test card or test mobile money from [Paystack's test payments page](https://paystack.com/docs/payments/test-payments). No real money moves.
+4. At payment, use Paystack's test card or test mobile money from [Paystack's test payments page](https://paystack.com/docs/payments/test-payments). In test mode, Paystack pre-fills a test MTN number; click **Confirm**. No real money moves.
+
+The server calls Paystack with PHP's `curl` extension when it's available, and otherwise with PHP's built-in HTTPS support. Some XAMPP setups start Apache without curl; payments still work either way.
 
 How a payment is checked (`actions/process_payment_action.php` → `OrderController::completePayment`):
 1. Our server creates the payment reference at checkout and remembers the exact amount.
