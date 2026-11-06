@@ -21,7 +21,7 @@ $__activeCat = (int) ($_GET['cat'] ?? 0);
         <?php endforeach; ?>
     </ul>
     <a href="<?= url('views/customize.php') ?>" class="hidden md:block mt-6 rounded-xl bg-ink text-cream p-4 hover:bg-black">
-        <span class="font-display font-bold text-lg">Design a box in 3D</span>
+        <span class="font-display font-bold text-lg">Design packaging in 3D</span>
         <span class="block text-sm text-cream/70 mt-1">Pick a size, upload your logo, see it fold.</span>
     </a>
 </aside>

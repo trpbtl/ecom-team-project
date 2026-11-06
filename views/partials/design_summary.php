@@ -1,8 +1,11 @@
-<?php /** Short description of a designed box. Expects $it with length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text. */ ?>
+<?php
+/** Short description of a design. Expects $it with design_type, length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text. */
+require_once __DIR__ . '/../../controllers/DesignTypes.php';
+?>
 <?php if (!empty($it['length_cm'])): ?>
     <p class="text-sm text-muted mt-1">
-        <?= rtrim(rtrim((string) $it['length_cm'], '0'), '.') ?> × <?= rtrim(rtrim((string) $it['width_cm'], '0'), '.') ?> × <?= rtrim(rtrim((string) $it['height_cm'], '0'), '.') ?> cm
-        · <?= $it['material'] === 'white' ? 'White' : 'Kraft' ?> board
+        <?= e(DesignTypes::describeSize($it['design_type'] ?? null, $it['length_cm'], $it['width_cm'], $it['height_cm'])) ?>
+        · <?= e(DesignTypes::materialName($it['design_type'] ?? null, $it['material'])) ?>
         <?php if ($it['print_colour']): ?>
             · <span class="inline-block w-3 h-3 rounded-full align-middle border border-line" style="background: <?= e($it['print_colour']) ?>"></span> print
         <?php endif; ?>

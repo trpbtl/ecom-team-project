@@ -45,9 +45,14 @@ require __DIR__ . '/../layout/header.php';
             <small class="field-error" data-error-for="description"></small></label>
         <label class="field"><span>Keywords <span class="text-muted">(for search)</span></span>
             <input class="input" name="keywords" value="<?= $v('keywords') ?>" maxlength="255" placeholder="box, mailer, shipping"></label>
-        <label class="flex items-start gap-2 text-sm">
-            <input type="checkbox" name="is_customizable" value="1" class="mt-1 accent-[#c2410c]" <?= ($editing['is_customizable'] ?? ($_SESSION['old']['is_customizable'] ?? 0)) ? 'checked' : '' ?>>
-            <span>Customers design this product in the 3D designer (price is then worked out from size and options)</span></label>
+        <label class="field"><span>3D designer <span class="text-muted">(customers can design their own version)</span></span>
+            <select class="input" name="design_type">
+                <option value="">None: sold ready-made only</option>
+                <?php foreach (DesignTypes::options() as $key => $label): ?>
+                    <option value="<?= e($key) ?>" <?= $key === html_entity_decode($v('design_type')) ? 'selected' : '' ?>><?= e($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <span class="text-xs text-muted">The price above is for the plain product. Designs are priced from size, material, print and quantity.</span></label>
         <label class="field"><span>Image <span class="text-muted">(JPG, PNG, GIF or WebP, up to 2 MB)</span></span>
             <?php if ($editing && $editing['image']): ?>
                 <img src="<?= product_image_url($editing['image']) ?>" alt="Current image" class="w-32 h-24 object-cover rounded-lg border border-line">
@@ -71,7 +76,7 @@ require __DIR__ . '/../layout/header.php';
                         <td class="py-3">
                             <div class="flex items-center gap-3">
                                 <img src="<?= product_image_url($p['image']) ?>" alt="" class="w-12 h-10 object-cover rounded">
-                                <span class="font-medium"><?= e($p['name']) ?><?= $p['is_customizable'] ? ' <span class="badge status-processing">3D</span>' : '' ?></span>
+                                <span class="font-medium"><?= e($p['name']) ?><?= DesignTypes::get($p['design_type']) ? ' <span class="badge status-processing">3D</span>' : '' ?></span>
                             </div>
                         </td>
                         <td><?= e($p['category_name']) ?></td>

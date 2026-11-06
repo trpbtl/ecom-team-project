@@ -5,7 +5,7 @@ require_once __DIR__ . '/../controllers/ProductController.php';
 require_admin();
 require_post('views/admin/product.php');
 
-$fields = ['category_id', 'name', 'description', 'material', 'base_price', 'keywords', 'is_customizable'];
+$fields = ['category_id', 'name', 'description', 'material', 'base_price', 'keywords', 'design_type'];
 
 try {
     $image = save_uploaded_image('image', 'products');

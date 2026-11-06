@@ -37,12 +37,13 @@ CREATE TABLE products (
     base_price       DECIMAL(10,2) NOT NULL,
     image            VARCHAR(255) NULL,
     keywords         VARCHAR(255) NULL,
-    is_customizable  TINYINT NOT NULL DEFAULT 0,
+    is_customizable  TINYINT NOT NULL DEFAULT 0,      -- 1 = can be designed in the 3D designer
+    design_type      VARCHAR(20) NULL,                -- which designer template (see controllers/DesignTypes.php)
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 ) ENGINE=InnoDB;
 
--- A box a customer designed in the 3D designer
+-- Something a customer designed in the 3D designer (length/width/height mean what the template says: e.g. pouch gusset, catalogue pages)
 CREATE TABLE customizations (
     customization_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id      INT NULL,
@@ -130,19 +131,20 @@ CREATE TABLE deliveries (
 ) ENGINE=InnoDB;
 
 -- Starter data: the categories and products from the Packe CMS site
-INSERT INTO categories (category_name) VALUES ('Custom Packages'), ('Custom Labels'), ('Printed Materials');
+INSERT INTO categories (category_name) VALUES ('Custom Packages'), ('Custom Labels'), ('Printed Materials'), ('Food Packaging');
 
-INSERT INTO products (category_id, name, description, material, base_price, keywords, is_customizable, image) VALUES
-(1, 'Custom Mailer Box', 'Design your own mailer box in 3D: choose the size, kraft or white board, a print colour and your logo. Price per box depends on size and quantity.', 'Corrugated cardboard (E-flute)', 1.20, 'mailer box custom design 3d branded', 1, 'catalog/mailer-box.svg'),
-(1, 'Corrugated Shipping Box', 'Strong corrugated box for shipping orders across Ghana.', 'Corrugated cardboard', 45.00, 'shipping box corrugated carton', 0, 'catalog/shipping-box.svg'),
-(1, 'Collapsible Apparel Box', 'Folding box for clothing and accessories.', 'Rigid board', 60.00, 'apparel box clothing fashion', 0, 'catalog/apparel-box.svg'),
-(1, 'Clear Window Pouch', 'Stand-up pouch with a clear window to show your product.', 'Kraft paper with PET window', 35.00, 'pouch window food snacks', 0, 'catalog/window-pouch.svg'),
-(2, 'Tamper Evident Seal', 'Seal that shows if a package has been opened.', 'Vinyl', 22.00, 'seal label security', 0, 'catalog/tamper-seal.svg'),
-(2, 'Rectangular Address Label', 'Printed address labels for parcels.', 'Paper label', 15.00, 'label address shipping', 0, 'catalog/address-label.svg'),
-(2, 'Circular Product Sticker', 'Round stickers for branding your products.', 'Gloss vinyl', 12.00, 'sticker round logo label', 0, 'catalog/product-sticker.svg'),
-(3, 'Business Product Catalog', 'Printed catalogue to showcase your product range.', 'Coated paper', 150.00, 'catalog catalogue print brochure', 0, 'catalog/product-catalog.svg'),
-(3, 'Marketing Tri-fold Brochure', 'Tri-fold brochure for promotions and events.', 'Gloss paper', 55.00, 'brochure flyer marketing', 0, 'catalog/trifold-brochure.svg'),
-(3, 'Branded Thank-You Card', 'Thank-you cards to put inside every order.', 'Card stock', 28.00, 'card thank you insert', 0, 'catalog/thank-you-card.svg');
+INSERT INTO products (category_id, name, description, material, base_price, keywords, is_customizable, design_type, image) VALUES
+(1, 'Custom Mailer Box', 'Design your own mailer box in 3D: choose the size, kraft or white board, a print colour and your logo. Price per box depends on size and quantity.', 'Corrugated cardboard (E-flute)', 1.20, 'mailer box custom design 3d branded', 1, 'mailer', 'catalog/mailer-box.svg'),
+(1, 'Corrugated Shipping Box', 'Strong corrugated box for shipping orders across Ghana.', 'Corrugated cardboard', 45.00, 'shipping box corrugated carton', 1, 'carton', 'catalog/shipping-box.svg'),
+(1, 'Collapsible Apparel Box', 'Folding box for clothing and accessories.', 'Rigid board', 60.00, 'apparel box clothing fashion', 1, 'mailer', 'catalog/apparel-box.svg'),
+(1, 'Clear Window Pouch', 'Stand-up pouch with a clear window to show your product.', 'Kraft paper with PET window', 35.00, 'pouch window food snacks', 1, 'pouch', 'catalog/window-pouch.svg'),
+(2, 'Tamper Evident Seal', 'Seal that shows if a package has been opened.', 'Vinyl', 22.00, 'seal label security', 1, 'seal', 'catalog/tamper-seal.svg'),
+(2, 'Rectangular Address Label', 'Printed address labels for parcels.', 'Paper label', 15.00, 'label address shipping', 1, 'label', 'catalog/address-label.svg'),
+(2, 'Circular Product Sticker', 'Round stickers for branding your products.', 'Gloss vinyl', 12.00, 'sticker round logo label', 1, 'sticker', 'catalog/product-sticker.svg'),
+(3, 'Business Product Catalog', 'Printed catalogue to showcase your product range.', 'Coated paper', 150.00, 'catalog catalogue print brochure', 1, 'catalog', 'catalog/product-catalog.svg'),
+(3, 'Marketing Tri-fold Brochure', 'Tri-fold brochure for promotions and events.', 'Gloss paper', 55.00, 'brochure flyer marketing', 1, 'brochure', 'catalog/trifold-brochure.svg'),
+(3, 'Branded Thank-You Card', 'Thank-you cards to put inside every order.', 'Card stock', 28.00, 'card thank you insert', 1, 'card', 'catalog/thank-you-card.svg'),
+(4, 'Kraft Food Box', 'Fold-top takeaway box for meals and pastries, sealed with your logo sticker.', 'Food-safe kraft board', 38.50, 'food box takeaway restaurant lunch', 1, 'foodbox', 'catalog/food-box.svg');
 
 -- To make yourself an admin after registering:
 --   UPDATE customers SET user_role = 1 WHERE email = 'you@example.com';

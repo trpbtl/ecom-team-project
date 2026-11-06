@@ -72,10 +72,13 @@
     },
     design(f) {
       const e = {};
-      const limits = { length: [10, 60], width: [8, 50], height: [3, 30] };
-      for (const [k, [lo, hi]] of Object.entries(limits)) {
-        const v = parseFloat(val(f, k));
-        if (!(v >= lo && v <= hi)) { e.length = `${k[0].toUpperCase() + k.slice(1)} must be between ${lo} and ${hi} cm.`; break; }
+      // Each size box carries its own limits (they differ per packaging type)
+      for (const k of ['length', 'width', 'height']) {
+        const input = field(f, k);
+        if (!input) continue;
+        const v = parseFloat(input.value), lo = parseFloat(input.min), hi = parseFloat(input.max);
+        if (!(v >= lo && v <= hi)) { e.length = `${input.dataset.label} must be between ${lo} and ${hi}${input.dataset.unit}.`; break; }
+        if (input.step === '4' && v % 4 !== 0) { e.length = `${input.dataset.label} must be a multiple of 4.`; break; }
       }
       const img = fileProblem(field(f, 'logo'), 5, ['image/jpeg', 'image/png', 'image/webp']);
       if (img) e.logo = img;

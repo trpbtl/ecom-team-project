@@ -18,7 +18,8 @@
     <p class="text-center text-xs text-muted pb-6">&copy; <?= date('Y') ?> Packe · E-commerce team project</p>
 </footer>
 
-<script src="<?= url('js/validate.js') ?>"></script>
+<script src="<?= asset_url('js/validate.js') ?>"></script>
+<script src="<?= asset_url('js/cart.js') ?>"></script>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 </body>
 </html>

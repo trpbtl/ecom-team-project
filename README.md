@@ -8,9 +8,11 @@ The platform is for SMEs, online retailers, restaurants, cosmetics brands and ma
 
 ## Features
 
-- **3D box designer**: set the size, pick kraft or white board and a print colour, upload a logo and watch the box fold up in 3D. A flat dieline view shows cut and fold lines.
-- **Instant pricing**: the browser shows an estimate and the server calculates the real price from size, board, print, branding and quantity tier.
-- **Shop**: categories, search and product pages for ready-made packaging, labels and printed materials.
+- **3D designer for every packaging type**: mailer boxes, takeaway food boxes (sealed with a round logo sticker), shipping cartons, stand-up pouches, labels, round stickers, tamper seals, cards, tri-fold brochures and catalogues. Set the size, material, print colour, logo and text, and watch it in 3D (boxes, brochures and catalogues fold and unfold). A flat layout view shows cut and fold lines. The templates live in `controllers/DesignTypes.php`.
+- **Instant pricing**: the browser shows an estimate and the server calculates the real price from size, material, print, branding and quantity step, using the same rules.
+- **Shop**: categories, search and product pages. Every product can be bought ready-made, or designed.
+- **Home page showcase**: the 3D window on the home page cycles through a mailer box, food box, pouch, carton, catalogue and sticker, using the same models as the designer (`js/packaging3d.js`).
+- **Add to cart without reloading**: the cart badge updates the moment you click; the item is saved in the background (`js/cart.js`). Adding the same item again raises its quantity.
 - **Cart**: works for guests (a cookie keeps the cart) and carries over after login.
 - **Checkout with delivery**: recipient, address, and standard or express delivery.
 - **Paystack payments (test mode)**: mobile money or card in Paystack's popup. Each payment is **verified on the server** with Paystack's API before an order is recorded.
@@ -46,7 +48,8 @@ views/         Pages: HTML with loops and conditions only (no SQL)
   account/     my account, edit details, change password, delete account, order
   admin/       dashboard, products, categories, orders, order detail
   delivery/    my deliveries (delivery staff)
-js/            validate.js (form checks with regex), designer.js (3D designer)
+js/            validate.js (form checks), cart.js (add to cart without reloading), packaging3d.js (3D models for every type),
+               designer.js (3D designer), hero3d.js (home page showcase)
 css/           style.css
 images/        logo, placeholder, products/ and designs/ (uploads)
 database/      packe.sql (tables and starter products)
@@ -124,6 +127,7 @@ How a payment is checked (`actions/process_payment_action.php` → `OrderControl
    - `DB_SSL_CA`: open `ca.pem` in Notepad and paste its whole text
    - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
 5. Open the `onrender.com` address Render gives you.
+6. **After each deploy that changes the database**, open `/setup.php` on the site once. On a database that is already set up, it only adds what's missing (for example the `design_type` column) and never deletes data.
 
 Notes on the free plans:
 - Render's free service **sleeps after 15 minutes** without visits, and the first visit after that takes about a minute. Open the site a minute before a demo.

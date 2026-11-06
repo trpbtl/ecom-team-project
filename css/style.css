@@ -65,3 +65,18 @@ h1, h2, h3 { text-wrap: balance; }
 table th { font-weight: 600; }
 :focus-visible { outline: 2px solid var(--packe); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Add-to-cart messages (js/cart.js) */
+.toast-stack { position: fixed; right: 1rem; bottom: 1rem; z-index: 60; display: flex; flex-direction: column; gap: .5rem; max-width: min(360px, calc(100vw - 2rem)); }
+.toast { display: flex; align-items: center; gap: .9rem; padding: .75rem 1rem; border-radius: .8rem; font-size: .92rem;
+  box-shadow: 0 10px 30px rgba(28, 26, 24, .18); animation: toast-in .2s ease-out; transition: opacity .3s, transform .3s; }
+.toast p { flex: 1; margin: 0; }
+.toast-ok { background: var(--ink); color: var(--cream); }
+.toast-error { background: #fdeeee; color: #8f1c13; border: 1px solid #f4c4c0; }
+.toast-link { font-weight: 700; color: #fdba74; white-space: nowrap; }
+.toast-link:hover { text-decoration: underline; }
+.toast-out { opacity: 0; transform: translateY(6px); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+.cart-bump { animation: cart-bump .35s ease-out; }
+@keyframes cart-bump { 40% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .toast, .cart-bump { animation: none; } }

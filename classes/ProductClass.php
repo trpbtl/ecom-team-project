@@ -51,10 +51,10 @@ class ProductClass extends Database
     public function addProduct(array $d): int
     {
         $this->execute(
-            'INSERT INTO products (category_id, name, description, material, base_price, image, keywords, is_customizable)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            'isssdssi',
-            [$d['category_id'], $d['name'], $d['description'], $d['material'], $d['base_price'], $d['image'], $d['keywords'], $d['is_customizable']]
+            'INSERT INTO products (category_id, name, description, material, base_price, image, keywords, is_customizable, design_type)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'isssdssis',
+            [$d['category_id'], $d['name'], $d['description'], $d['material'], $d['base_price'], $d['image'], $d['keywords'], $d['is_customizable'], $d['design_type']]
         );
         return $this->conn->insert_id;
     }
@@ -63,10 +63,10 @@ class ProductClass extends Database
     {
         $this->execute(
             'UPDATE products SET category_id = ?, name = ?, description = ?, material = ?, base_price = ?,
-                    image = ?, keywords = ?, is_customizable = ?
+                    image = ?, keywords = ?, is_customizable = ?, design_type = ?
              WHERE product_id = ?',
-            'isssdssii',
-            [$d['category_id'], $d['name'], $d['description'], $d['material'], $d['base_price'], $d['image'], $d['keywords'], $d['is_customizable'], $id]
+            'isssdssisi',
+            [$d['category_id'], $d['name'], $d['description'], $d['material'], $d['base_price'], $d['image'], $d['keywords'], $d['is_customizable'], $d['design_type'], $id]
         );
         return true;
     }

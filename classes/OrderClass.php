@@ -105,7 +105,7 @@ class OrderClass extends Database
     public function getOrderItems(int $orderId): array
     {
         return $this->fetchAll(
-            'SELECT oi.*, p.name, p.image, oi.unit_price * oi.quantity AS line_total,
+            'SELECT oi.*, p.name, p.image, p.design_type, oi.unit_price * oi.quantity AS line_total,
                     cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text
              FROM order_items oi
              JOIN products p ON p.product_id = oi.product_id

@@ -15,7 +15,7 @@ require __DIR__ . '/layout/header.php';
     <div class="card p-10 text-center">
         <p class="text-lg">Your cart is empty.</p>
         <div class="flex justify-center gap-3 mt-4">
-            <a href="<?= url('views/customize.php') ?>" class="btn btn-primary">Design a box</a>
+            <a href="<?= url('views/customize.php') ?>" class="btn btn-primary">Design your packaging</a>
             <a href="<?= url('views/all_products.php') ?>" class="btn btn-ghost">Browse products</a>
         </div>
     </div>

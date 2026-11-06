@@ -15,9 +15,11 @@
   <g transform="rotate(4 170 170)" filter="url(#shadow)">
     <rect x="70" y="96" width="200" height="140" rx="6" fill="#fffdf9"/>
     <rect x="80" y="106" width="180" height="120" rx="3" fill="none" stroke="#e6dfd3"/>
-    <text x="170" y="160" font-family="Brush Script MT, Georgia, cursive" font-size="34" font-style="italic" fill="#c2410c" text-anchor="middle">Thank you</text>
-    <text x="170" y="184" font-family="Arial, sans-serif" font-size="9" letter-spacing="3" fill="#6b635a" text-anchor="middle">FOR SUPPORTING OUR SMALL BUSINESS</text>
-    <g transform="translate(170 208)">
+    <!-- textLength keeps the words inside the card whatever font the computer has -->
+    <text x="170" y="156" font-family="Brush Script MT, Georgia, cursive" font-size="32" font-style="italic" fill="#c2410c" text-anchor="middle" textLength="128" lengthAdjust="spacingAndGlyphs">Thank you</text>
+    <text x="170" y="180" font-family="Arial, sans-serif" font-size="8" fill="#6b635a" text-anchor="middle" textLength="118" lengthAdjust="spacingAndGlyphs">FOR SUPPORTING OUR</text>
+    <text x="170" y="192" font-family="Arial, sans-serif" font-size="8" fill="#6b635a" text-anchor="middle" textLength="90" lengthAdjust="spacingAndGlyphs">SMALL BUSINESS</text>
+    <g transform="translate(170 210)">
       <path d="M -6 -2 C -6 -8 0 -9 0 -4 C 0 -9 6 -8 6 -2 C 6 3 0 6 0 8 C 0 6 -6 3 -6 -2 Z" fill="#c2410c"/>
     </g>
   </g>

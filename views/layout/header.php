@@ -7,8 +7,9 @@ require_once __DIR__ . '/../../controllers/CartController.php';
 
 $__cart = new CartController();
 $__key = get_cart_key();
-$cartCount = $__cart->getCartCount($__key);
-$cartTotal = $__cart->getCartTotal($__key);
+$__sum = $__cart->getCartSummary($__key);   // one database trip for the whole badge
+$cartCount = $__sum['count'];
+$cartTotal = $__sum['total'];
 $flashSuccess = take_flash('success');
 $flashError = take_flash('error');
 $__here = basename($_SERVER['SCRIPT_NAME'] ?? '');
@@ -41,7 +42,7 @@ function nav_class(string $file, string $here): string
             } }
         };
     </script>
-    <link rel="stylesheet" href="<?= url('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= asset_url('css/style.css') ?>">
 </head>
 <body class="bg-cream text-ink font-sans antialiased min-h-screen flex flex-col">
 
@@ -54,7 +55,7 @@ function nav_class(string $file, string $here): string
 
         <nav class="flex items-center gap-5 text-[15px]" aria-label="Main">
             <a href="<?= url('views/all_products.php') ?>" class="<?= nav_class('all_products.php', $__here) ?>">Shop</a>
-            <a href="<?= url('views/customize.php') ?>" class="<?= nav_class('customize.php', $__here) ?>">Design a box</a>
+            <a href="<?= url('views/customize.php') ?>" class="<?= nav_class('customize.php', $__here) ?>">Design packaging</a>
             <?php if (is_admin()): ?>
                 <a href="<?= url('views/admin/dashboard.php') ?>" class="<?= nav_class('dashboard.php', $__here) ?>">Dashboard</a>
                 <a href="<?= url('views/admin/orders.php') ?>" class="<?= nav_class('orders.php', $__here) ?>">Orders</a>
@@ -81,9 +82,10 @@ function nav_class(string $file, string $here): string
                 <a href="<?= url('views/login.php') ?>" class="text-ink/80 hover:text-ink">Log in</a>
                 <a href="<?= url('views/register.php') ?>" class="text-ink/80 hover:text-ink">Register</a>
             <?php endif; ?>
-            <a href="<?= url('views/cart.php') ?>" class="btn btn-dark !py-2" aria-label="Cart: <?= $cartCount ?> items, <?= money($cartTotal) ?>">
-                Cart <span class="tabular-nums">(<?= $cartCount ?>)</span>
-                <span class="hidden sm:inline tabular-nums opacity-80">· <?= money($cartTotal) ?></span>
+            <a href="<?= url('views/cart.php') ?>" id="cart-link" class="btn btn-dark !py-2" aria-label="Cart: <?= $cartCount ?> items, <?= money($cartTotal) ?>"
+               data-count="<?= $cartCount ?>" data-total="<?= $cartTotal ?>" data-plain='<?= e(json_encode($__sum['plain_ids'])) ?>'>
+                Cart <span class="tabular-nums">(<span id="cart-count"><?= $cartCount ?></span>)</span>
+                <span class="hidden sm:inline tabular-nums opacity-80">· <span id="cart-total"><?= money($cartTotal) ?></span></span>
             </a>
         </div>
     </div>
