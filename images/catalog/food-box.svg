@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Kraft takeaway food box with a fold-top lid sealed by a round logo sticker">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#fdf8f1"/><stop offset="1" stop-color="#ede4d6"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <ellipse cx="212" cy="236" rx="135" ry="30" fill="#000" opacity=".16" filter="url(#soft)"/>
+  <!-- walls lean outwards: the top is wider than the base -->
+  <polygon points="200,246 118,198 100,140 200,198" fill="#b98a57"/>
+  <polygon points="200,246 306,186 328,126 200,198" fill="#cfa16c"/>
+  <!-- end flaps showing at the corners -->
+  <polygon points="100,140 128,130 140,150" fill="#a87a49"/>
+  <polygon points="328,126 300,120 296,142" fill="#b88c5a"/>
+  <!-- front lid flap -->
+  <polygon points="100,140 200,198 266,160 166,104" fill="#d8ad79"/>
+  <!-- back lid flap with its tongue, folded over the front one -->
+  <polygon points="166,104 266,160 328,126 228,70" fill="#e2b984"/>
+  <path d="M196 133 Q204 150 222 147 Q238 145 236 130" fill="#e2b984"/>
+  <line x1="166" y1="104" x2="266" y2="160" stroke="#b88c5a" stroke-width="1.5"/>
+  <line x1="200" y1="198" x2="200" y2="246" stroke="#a87a49" stroke-width="1" opacity=".5"/>
+  <!-- round logo sticker -->
+  <g transform="translate(216 132)">
+    <ellipse rx="27" ry="16" fill="#1c1a18"/>
+    <ellipse rx="23" ry="13" fill="none" stroke="#fff" stroke-width="1" opacity=".6"/>
+    <g transform="matrix(0.866,-0.5,0.866,0.5,0,0)">
+      <text x="0" y="3" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="9" text-anchor="middle" fill="#fff">YOUR LOGO</text>
+    </g>
+  </g>
+</svg>

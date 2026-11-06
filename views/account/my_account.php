@@ -40,7 +40,7 @@ require __DIR__ . '/../layout/header.php';
         <section class="card p-6">
             <h2 class="font-display font-bold text-xl mb-4">My orders</h2>
             <?php if (!$orders): ?>
-                <p class="text-muted">No orders yet. <a href="<?= url('views/customize.php') ?>" class="text-packe-600 font-semibold hover:underline">Design your first box</a>.</p>
+                <p class="text-muted">No orders yet. <a href="<?= url('views/customize.php') ?>" class="text-packe-600 font-semibold hover:underline">Design your first package</a>.</p>
             <?php else: ?>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -63,7 +63,7 @@ require __DIR__ . '/../layout/header.php';
         </section>
 
         <section class="card p-6">
-            <h2 class="font-display font-bold text-xl mb-4">My box designs</h2>
+            <h2 class="font-display font-bold text-xl mb-4">My designs</h2>
             <?php if (!$designs): ?>
                 <p class="text-muted">Designs you save in the 3D designer appear here.</p>
             <?php else: ?>
@@ -71,7 +71,7 @@ require __DIR__ . '/../layout/header.php';
                     <?php foreach ($designs as $it): ?>
                         <li class="py-3 flex flex-wrap justify-between gap-2">
                             <div>
-                                <p class="font-medium"><?= e($it['product_name']) ?> · <?= (int) $it['quantity'] ?> boxes</p>
+                                <p class="font-medium"><?= e($it['product_name']) ?> · <?= (int) $it['quantity'] ?> <?= e(DesignTypes::nounPlural($it['design_type'])) ?></p>
                                 <?php include __DIR__ . '/../partials/design_summary.php'; ?>
                             </div>
                             <p class="tabular-nums text-sm"><?= money($it['unit_price']) ?> each · <?= e(date('j M Y', strtotime($it['created_at']))) ?></p>

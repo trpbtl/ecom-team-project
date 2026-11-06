@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/../classes/ProductClass.php';
 require_once __DIR__ . '/Validate.php';
+require_once __DIR__ . '/DesignTypes.php';
 
 class ProductController
 {
@@ -59,8 +60,9 @@ class ProductController
             'base_price'      => filter_var($in['base_price'] ?? '', FILTER_VALIDATE_FLOAT),
             'image'           => $image,
             'keywords'        => Validate::clean($in['keywords'] ?? ''),
-            'is_customizable' => !empty($in['is_customizable']) ? 1 : 0,
+            'design_type'     => is_string($in['design_type'] ?? null) && DesignTypes::get($in['design_type']) ? $in['design_type'] : null,
         ];
+        $d['is_customizable'] = $d['design_type'] ? 1 : 0;   // products with a template open in the 3D designer
         if (!$d['category_id'] || !$this->model->getCategoryById($d['category_id'])) $d['error'] = 'Choose a category.';
         elseif (!Validate::text($d['name'], 2, 150))  $d['error'] = 'Product name must be 2 to 150 characters.';
         elseif ($d['base_price'] === false || $d['base_price'] <= 0 || $d['base_price'] > 100000) $d['error'] = 'Enter a price between 0.01 and 100,000.';

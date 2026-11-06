@@ -25,11 +25,44 @@ class CartClass extends Database
         return $this->conn->insert_id;
     }
 
+    /** Ready-made product already in the cart: add to its quantity (capped at 10,000). */
+    public function increaseQty(int $productId, int $qty, string $cartKey): void
+    {
+        $this->execute(
+            'UPDATE cart SET quantity = LEAST(quantity + ?, 10000)
+             WHERE product_id = ? AND cart_key = ? AND customization_id IS NULL',
+            'iis', [$qty, $productId, $cartKey]
+        );
+    }
+
+    /**
+     * Everything the header needs in ONE query (the database is far away on the free plan, so fewer trips is faster):
+     * number of lines, total, and which ready-made products are already in the cart.
+     */
+    public function getCartSummary(string $cartKey): array
+    {
+        $rows = $this->fetchAll(
+            'SELECT ct.product_id, ct.customization_id, COALESCE(cz.unit_price, p.base_price) * ct.quantity AS line_total
+             FROM cart ct
+             JOIN products p ON p.product_id = ct.product_id
+             LEFT JOIN customizations cz ON cz.customization_id = ct.customization_id
+             WHERE ct.cart_key = ?',
+            's', [$cartKey]
+        );
+        $total = 0.0;
+        $plain = [];
+        foreach ($rows as $r) {
+            $total += (float) $r['line_total'];
+            if ($r['customization_id'] === null) $plain[] = (int) $r['product_id'];
+        }
+        return ['count' => count($rows), 'total' => round($total, 2), 'plain_ids' => $plain];
+    }
+
     public function getCartItems(string $cartKey): array
     {
         return $this->fetchAll(
             'SELECT ct.cart_id, ct.product_id, ct.customization_id, ct.quantity,
-                    p.name, p.image, p.material AS product_material, c.category_name,
+                    p.name, p.image, p.material AS product_material, p.design_type, c.category_name,
                     COALESCE(cz.unit_price, p.base_price) AS unit_price,
                     COALESCE(cz.unit_price, p.base_price) * ct.quantity AS line_total,
                     cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text

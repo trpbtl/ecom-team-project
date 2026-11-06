@@ -22,15 +22,20 @@ class CartController
         $qty = Validate::positiveInt($qty) ?? 1;
         $product = $productId ? (new ProductClass())->getProductById($productId) : null;
         if (!$product) return Validate::fail('That product was not found.');
-        if ($product['is_customizable']) {
-            return ['success' => false, 'design' => true, 'error' => 'Design your box first, then add it to the cart.'];
-        }
         if ($qty > 10000) return Validate::fail('Please contact us for orders over 10,000 units.');
+        // Every product can be bought plain (ready-made); designs go through the designer instead
         if ($this->model->isInCart($productId, $cartKey)) {
-            return Validate::fail('This item is already in your cart. Go to your cart to change the quantity.');
+            $this->model->increaseQty($productId, $qty, $cartKey);
+        } else {
+            $this->model->addToCart($productId, $qty, $cartKey, $customerId);
         }
-        $this->model->addToCart($productId, $qty, $cartKey, $customerId);
         return ['success' => true, 'name' => $product['name']];
+    }
+
+    /** Count, total and plain product ids, from one query. */
+    public function getCartSummary(string $cartKey): array
+    {
+        return $this->model->getCartSummary($cartKey);
     }
 
     public function addDesign(int $productId, int $customizationId, int $qty, string $cartKey, ?int $customerId): void

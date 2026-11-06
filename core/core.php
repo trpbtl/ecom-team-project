@@ -47,6 +47,25 @@ function url(string $path = ''): string
     return BASE_URL . '/' . ltrim($path, '/');
 }
 
+/** URL of a script or stylesheet with a version stamp, so browsers fetch the new file after each change. */
+function asset_url(string $path): string
+{
+    $file = APP_ROOT . '/' . ltrim($path, '/');
+    return url($path) . (is_file($file) ? '?v=' . filemtime($file) : '');
+}
+
+/** The import map and module script for pages with 3D (Three.js from the CDN, plus our shared packaging models). */
+function three_scripts(string $script): string
+{
+    $map = ['imports' => [
+        'three'         => 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js',
+        'three/addons/' => 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/',
+        'packe3d'       => asset_url('js/packaging3d.js'),
+    ]];
+    return '<script type="importmap">' . json_encode($map, JSON_UNESCAPED_SLASHES) . '</script>'
+         . '<script type="module" src="' . e(asset_url($script)) . '"></script>';
+}
+
 function redirect(string $path): void
 {
     header('Location: ' . (preg_match('#^https?://#', $path) ? $path : url($path)));
@@ -74,7 +93,7 @@ function product_image_url(?string $file): string
         return url('images/placeholder.svg');
     }
     if (preg_match('#^catalog/[a-z0-9-]+\.svg$#', $file)) {
-        return url('images/' . $file);
+        return asset_url('images/' . $file);   // versioned, so updated pictures show at once
     }
     return url('images/products/' . rawurlencode(basename($file)));
 }
@@ -129,9 +148,27 @@ function require_post(string $backTo): void
         redirect($backTo);
     }
     if (!hash_equals(csrf_token(), (string) ($_POST['csrf'] ?? ''))) {
+        if (wants_json()) {
+            json_out(['success' => false, 'error' => 'Your session expired. Please refresh the page and try again.'], 419);
+        }
         flash('error', 'Your session expired. Please try again.');
         redirect($backTo);
     }
+}
+
+/* ---------- Background requests (js/cart.js sends forms without reloading the page) ---------- */
+function wants_json(): bool
+{
+    return ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch';
+}
+
+function json_out(array $data, int $status = 200): void
+{
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo json_encode($data);
+    exit;
 }
 
 /* ---------- Access control ---------- */

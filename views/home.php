@@ -5,13 +5,17 @@ require_once __DIR__ . '/../controllers/ProductController.php';
 $pc = new ProductController();
 $products = $pc->getFeaturedProducts(4);
 $categories = array_filter($pc->getAllCategories(), fn($c) => (int) $c['product_count'] > 0);
+// Hero showcase: the name and starting price of each packaging type it cycles through (js/hero3d.js)
+$showcase = [];
+foreach (['mailer', 'foodbox', 'pouch', 'carton', 'catalog', 'sticker'] as $type) {
+    $showcase[$type] = ['label' => 'Custom ' . strtolower(DesignTypes::TYPES[$type]['label']), 'from' => money(DesignTypes::fromPrice($type))];
+}
 $pageTitle = 'Custom packaging for Ghanaian businesses';
-$extraScripts = '<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>'
-              . '<script type="module" src="' . url('js/hero3d.js') . '"></script>';
+$extraScripts = three_scripts('js/hero3d.js');
 require __DIR__ . '/layout/header.php';
 ?>
 
-<!-- Hero: one line of promise, one live 3D box that shows it -->
+<!-- Hero: one line of promise, and live 3D packaging that shows it -->
 <section class="grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-4 items-center -mt-2">
     <div class="flex flex-col gap-6 order-2 lg:order-1">
         <p class="inline-flex self-start items-center gap-2 rounded-full bg-white border border-line px-3 py-1.5 text-sm">
@@ -22,7 +26,7 @@ require __DIR__ . '/layout/header.php';
         </h1>
         <p class="text-lg text-muted max-w-md">Design it in 3D, see the price instantly, and we deliver.</p>
         <div class="flex flex-wrap gap-3">
-            <a href="<?= url('views/customize.php') ?>" class="btn btn-primary !px-6 !py-3.5 text-base">Design your box</a>
+            <a href="<?= url('views/customize.php') ?>" class="btn btn-primary !px-6 !py-3.5 text-base">Design your packaging</a>
             <a href="<?= url('views/all_products.php') ?>" class="btn btn-ghost !px-6 !py-3.5 text-base">Browse packaging</a>
         </div>
         <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink/80 pt-2">
@@ -36,11 +40,12 @@ require __DIR__ . '/layout/header.php';
         <div class="relative rounded-[2rem] overflow-hidden aspect-[5/4] bg-[radial-gradient(ellipse_at_50%_45%,#fff7ef_0%,#f6e3d2_45%,#ecd9c3_100%)]">
             <div class="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-packe-500/15 blur-3xl" aria-hidden="true"></div>
             <canvas id="hero-gl" class="absolute inset-0 w-full h-full cursor-grab" data-fallback="<?= url('images/catalog/mailer-box.svg') ?>"
-                    aria-label="A mailer box turning and opening, changing its print colour and brand name"></canvas>
+                    data-showcase='<?= e(json_encode($showcase)) ?>'
+                    aria-label="Custom packaging turning in 3D: mailer box, food box, pouch, carton, catalogue and sticker"></canvas>
             <!-- floating details -->
             <div class="absolute left-4 top-4 md:left-6 md:top-6 rounded-2xl bg-white/90 backdrop-blur px-4 py-3 shadow-sm">
-                <p class="text-xs text-muted">Custom mailer box</p>
-                <p class="font-display font-extrabold text-xl tabular-nums">from <?= money(1.20) ?></p>
+                <p class="text-xs text-muted" id="hero-type">Custom mailer box</p>
+                <p class="font-display font-extrabold text-xl tabular-nums" id="hero-price">from <?= e($showcase['mailer']['from']) ?></p>
             </div>
             <div id="hero-look" class="absolute right-4 bottom-4 md:right-6 md:bottom-6 flex items-center gap-2 rounded-full bg-white/90 backdrop-blur pl-2 pr-4 py-2 shadow-sm text-sm">
                 <span data-swatch class="w-6 h-6 rounded-full border border-black/10" style="background:#d14615"></span>

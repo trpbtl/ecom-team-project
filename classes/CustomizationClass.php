@@ -27,7 +27,7 @@ class CustomizationClass extends Database
     public function getCustomizationsByCustomer(int $customerId): array
     {
         return $this->fetchAll(
-            'SELECT cz.*, p.name AS product_name FROM customizations cz
+            'SELECT cz.*, p.name AS product_name, p.design_type FROM customizations cz
              JOIN products p ON p.product_id = cz.product_id
              WHERE cz.customer_id = ? ORDER BY cz.created_at DESC',
             'i', [$customerId]
