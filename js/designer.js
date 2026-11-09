@@ -27,6 +27,8 @@ function readForm() {
   state.material = form.querySelector('input[name=material]:checked').value;
   state.ink = $('print_colour').value;
   state.text = $('brandText').value.trim();
+  const [, family, weight] = CFG.fonts[form.querySelector('input[name=font]:checked')?.value] || [];
+  state.fontFamily = family || ''; state.fontWeight = weight || 700;
   state.logoScale = $('logoScale').value / 100;
   state.qty = parseInt(form.querySelector('input[name=quantity]:checked').value, 10);
 }
@@ -184,7 +186,15 @@ function refresh() {
   });
 }
 form.addEventListener('input', e => { if (e.target.id !== 'customInk' && e.target.id !== 'logo') refresh(); });
-form.addEventListener('change', e => { if (e.target.name === 'material' || e.target.name === 'quantity') refresh(); });
+form.addEventListener('change', e => {
+  if (e.target.name === 'material' || e.target.name === 'quantity') refresh();
+  if (e.target.name === 'font') {
+    // A canvas can only draw a web font once it has downloaded, so wait for it, then redraw
+    const [, family, weight] = CFG.fonts[e.target.value] || [];
+    if (family && document.fonts) document.fonts.load(`${weight} 48px "${family}"`).then(refresh, refresh);
+    else refresh();
+  }
+});
 
 $('presets').addEventListener('click', e => {
   const b = e.target.closest('[data-size]'); if (!b) return;

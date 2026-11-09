@@ -1,5 +1,5 @@
 <?php
-/** Short description of a design. Expects $it with design_type, length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text. */
+/** Short description of a design. Expects $it with design_type, length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text, font. */
 require_once __DIR__ . '/../../controllers/DesignTypes.php';
 ?>
 <?php if (!empty($it['length_cm'])): ?>
@@ -10,6 +10,6 @@ require_once __DIR__ . '/../../controllers/DesignTypes.php';
             · <span class="inline-block w-3 h-3 rounded-full align-middle border border-line" style="background: <?= e($it['print_colour']) ?>"></span> print
         <?php endif; ?>
         <?php if ($it['logo_file']): ?> · logo<?php endif; ?>
-        <?php if ($it['brand_text']): ?> · “<?= e($it['brand_text']) ?>”<?php endif; ?>
+        <?php if ($it['brand_text']): ?> · “<?= e($it['brand_text']) ?>” in <?= e(DesignTypes::fontName($it['font'] ?? null)) ?> font<?php endif; ?>
     </p>
 <?php endif; ?>

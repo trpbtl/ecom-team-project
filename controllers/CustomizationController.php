@@ -51,6 +51,8 @@ class CustomizationController
         if ($ink !== '' && !preg_match(Validate::HEX, $ink)) return Validate::fail('Choose a valid print colour.');
         $text = Validate::clean($in['brand_text'] ?? '');
         if (mb_strlen($text) > 28) return ['success' => false, 'field' => 'brand_text', 'error' => 'Text must be 28 characters or fewer.'];
+        $font = (string) ($in['font'] ?? DesignTypes::DEFAULT_FONT);
+        if (!isset(DesignTypes::FONTS[$font])) return Validate::fail('Choose a font.');
         $qty = (int) ($in['quantity'] ?? 0);
         if (!in_array($qty, $t['qtys'], true)) return Validate::fail('Choose a quantity.');
 
@@ -67,6 +69,7 @@ class CustomizationController
             'print_colour' => $ink === '' ? null : strtolower($ink),
             'logo_file'    => $logoFile,
             'brand_text'   => $text === '' ? null : $text,
+            'font'         => $font,
             'quantity'     => $qty,
             'unit_price'   => $price,
         ]);

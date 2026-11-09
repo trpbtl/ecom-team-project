@@ -15,12 +15,12 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // What the showcase shows: type, size, look, and how far it opens (fold value; 100 = closed)
 const SHOW = [
-  { type: 'mailer',  L: 30, W: 22, H: 10,  open: 60, material: 'kraft', ink: '#d14615', text: 'YOUR BRAND', sub: 'THANK YOU FOR ORDERING', name: 'Kraft · Packe orange' },
-  { type: 'foodbox', L: 17, W: 12, H: 6.5, open: 62, zoom: 1.15, material: 'kraft', ink: '#1c1a18', text: "MAMA AMA'S", name: 'Kraft · Black sticker' },
-  { type: 'pouch',   L: 16, W: 24, H: 8,             material: 'kraft', ink: '#2f6b3a', text: 'KOFI BREW', sub: 'GHANA ROAST', name: 'Kraft paper · Green' },
-  { type: 'carton',  L: 40, W: 30, H: 25, open: 72, zoom: 0.85, material: 'kraft', ink: '',        text: 'ACCRA STREET', name: 'Brown corrugated' },
-  { type: 'catalog', L: 21, W: 29.7, H: 24, open: 55, zoom: 1.2, material: 'white', ink: '#1f4e79', text: 'AMA COSMETICS', sub: 'NATURAL SKINCARE', name: 'White gloss · Navy' },
-  { type: 'sticker', L: 10, W: 10, H: 0,             material: 'white', ink: '#e8b4b8', text: 'GREEN LEAF', sub: 'FRESH FROM THE FARM', name: 'White vinyl · Blush pink' },
+  { type: 'mailer',  L: 30, W: 22, H: 10,  open: 60, fontFamily: 'Archivo', fontWeight: 800, material: 'kraft', ink: '#d14615', text: 'YOUR BRAND', sub: 'THANK YOU FOR ORDERING', name: 'Kraft · Packe orange' },
+  { type: 'foodbox', L: 17, W: 12, H: 6.5, open: 62, zoom: 1.15, fontFamily: 'Pacifico', fontWeight: 400, material: 'kraft', ink: '#1c1a18', text: "Mama Ama's", name: 'Kraft · Black sticker' },
+  { type: 'pouch',   L: 16, W: 24, H: 8, fontFamily: 'Playfair Display', fontWeight: 700,             material: 'kraft', ink: '#2f6b3a', text: 'KOFI BREW', sub: 'GHANA ROAST', name: 'Kraft paper · Green' },
+  { type: 'carton',  L: 40, W: 30, H: 25, open: 72, zoom: 0.85, fontFamily: 'Bebas Neue', fontWeight: 400, material: 'kraft', ink: '',        text: 'ACCRA STREET', name: 'Brown corrugated' },
+  { type: 'catalog', L: 21, W: 29.7, H: 24, open: 55, zoom: 1.2, fontFamily: 'Montserrat', fontWeight: 700, material: 'white', ink: '#1f4e79', text: 'AMA COSMETICS', sub: 'NATURAL SKINCARE', name: 'White gloss · Navy' },
+  { type: 'sticker', L: 10, W: 10, H: 0, fontFamily: 'Caveat', fontWeight: 700,             material: 'white', ink: '#e8b4b8', text: 'Green Leaf', sub: 'FRESH FROM THE FARM', name: 'White vinyl · Blush pink' },
 ].filter(s => !Object.keys(PRICES).length || PRICES[s.type]);
 
 let renderer;
@@ -88,6 +88,11 @@ if (renderer && SHOW.length) {
     canvas.setAttribute('aria-label', `${info ? info.label : item.type} turning in 3D`);
   }
   show(0);
+  // Canvas text needs the web fonts downloaded first: once they are, redraw the item on screen
+  if (document.fonts) {
+    Promise.all(SHOW.map(s => document.fonts.load(`${s.fontWeight} 48px "${s.fontFamily}"`).catch(() => null)))
+      .then(() => show(index));
+  }
   controls.target.set(0, 6, 0);
 
   // Timeline per item (seconds): grow in, hold closed, open, hold, close, hold, shrink out

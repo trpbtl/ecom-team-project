@@ -21,12 +21,13 @@ if (!$product || !$t) {
 $config = [
     'type' => $type, 'noun' => $t['noun'], 'folds' => $t['folds'], 'fields' => $t['fields'],
     'base' => $t['base'], 'rate' => $t['rate'], 'ink' => $t['ink'], 'brand' => $t['brand'],
-    'qtys' => $t['qtys'], 'factors' => DesignTypes::FACTORS,
+    'qtys' => $t['qtys'], 'factors' => DesignTypes::FACTORS, 'fonts' => DesignTypes::FONTS,
 ];
 $defaultQty = $t['qtys'][1];
 $inks = ['' => 'No print colour', '#d14615' => 'Packe orange', '#1c1a18' => 'Black', '#1f4e79' => 'Navy', '#2f6b3a' => 'Green', '#e8b4b8' => 'Blush pink'];
 $swatch = ['kraft' => '#c79c6b', 'white' => '#f4f2ee'];
 $pageTitle = 'Design your ' . $product['name'];
+$extraHead = DesignTypes::fontsLink();
 $extraScripts = three_scripts('js/designer.js');
 require __DIR__ . '/layout/header.php';
 ?>
@@ -143,6 +144,17 @@ require __DIR__ . '/layout/header.php';
             <label class="field"><span class="text-sm">Text <span class="text-muted">(optional)</span></span>
                 <input class="input" type="text" id="brandText" name="brand_text" maxlength="28" placeholder="e.g. Thank you for your order">
                 <small class="field-error" data-error-for="brand_text"></small></label>
+            <div role="radiogroup" aria-labelledby="font-label">
+                <p id="font-label" class="text-sm mb-2">Font</p>
+                <div class="grid grid-cols-3 gap-2" id="fonts">
+                    <?php foreach (DesignTypes::FONTS as $key => [$name, $family, $weight]): ?>
+                        <label class="chip justify-center cursor-pointer !py-2 has-[:checked]:border-[#c2410c] has-[:checked]:shadow-[inset_0_0_0_1px_#c2410c] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#c2410c]">
+                            <input type="radio" name="font" value="<?= e($key) ?>" class="sr-only" <?= $key === DesignTypes::DEFAULT_FONT ? 'checked' : '' ?>>
+                            <span class="text-[17px] leading-tight" style="font-family: '<?= e($family) ?>', sans-serif; font-weight: <?= (int) $weight ?>"><?= e($name) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </fieldset>
 
         <fieldset>

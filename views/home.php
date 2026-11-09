@@ -11,6 +11,7 @@ foreach (['mailer', 'foodbox', 'pouch', 'carton', 'catalog', 'sticker'] as $type
     $showcase[$type] = ['label' => 'Custom ' . strtolower(DesignTypes::TYPES[$type]['label']), 'from' => money(DesignTypes::fromPrice($type))];
 }
 $pageTitle = 'Custom packaging for Ghanaian businesses';
+$extraHead = DesignTypes::fontsLink();
 $extraScripts = three_scripts('js/hero3d.js');
 require __DIR__ . '/layout/header.php';
 ?>

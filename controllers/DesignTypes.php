@@ -99,6 +99,32 @@ class DesignTypes
         ],
     ];
 
+    /** Fonts customers can choose for the text on their packaging: key => [name shown, font family, weight]. */
+    public const FONTS = [
+        'archivo'    => ['Modern', 'Archivo', 800],
+        'montserrat' => ['Clean', 'Montserrat', 700],
+        'playfair'   => ['Elegant', 'Playfair Display', 700],
+        'bebas'      => ['Bold', 'Bebas Neue', 400],
+        'pacifico'   => ['Script', 'Pacifico', 400],
+        'caveat'     => ['Handwritten', 'Caveat', 700],
+    ];
+    public const DEFAULT_FONT = 'archivo';
+
+    /** The Google Fonts stylesheet for every design font (pages with the 3D designer or showcase). */
+    public static function fontsLink(): string
+    {
+        $families = [];
+        foreach (self::FONTS as [, $family, $weight]) {
+            $families[] = 'family=' . str_replace(' ', '+', $family) . ':wght@' . $weight;
+        }
+        return '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?' . implode('&', $families) . '&display=swap">';
+    }
+
+    public static function fontName(?string $font): string
+    {
+        return self::FONTS[$font ?? ''][0] ?? self::FONTS[self::DEFAULT_FONT][0];
+    }
+
     public static function get(?string $type): ?array
     {
         return ($type !== null && isset(self::TYPES[$type])) ? self::TYPES[$type] : null;

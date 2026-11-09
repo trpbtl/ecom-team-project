@@ -56,6 +56,7 @@ CREATE TABLE customizations (
     print_colour     CHAR(7) NULL,
     logo_file        VARCHAR(255) NULL,
     brand_text       VARCHAR(40) NULL,
+    font             VARCHAR(20) NULL,                -- font for the text (see DesignTypes::FONTS)
     quantity         INT NOT NULL,
     unit_price       DECIMAL(10,2) NOT NULL,
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

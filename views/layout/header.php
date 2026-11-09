@@ -27,6 +27,7 @@ function nav_class(string $file, string $here): string
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap">
+    <?php if (!empty($extraHead)) echo $extraHead; /* e.g. the design fonts on the designer and home page */ ?>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script>
         tailwind.config = {

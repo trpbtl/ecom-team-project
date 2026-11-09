@@ -84,5 +84,12 @@ function upgrade(mysqli $c): string
         }
         $done[] = 'added the takeaway food box designer';
     }
+    $hasFont = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                          WHERE table_schema = DATABASE() AND table_name = 'customizations' AND column_name = 'font'")->fetch_row()[0];
+    if (!$hasFont) {
+        // Customers choose the font for the text on their packaging
+        $c->query('ALTER TABLE customizations ADD COLUMN font VARCHAR(20) NULL AFTER brand_text');
+        $done[] = 'added the font choice to designs';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }
