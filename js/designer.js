@@ -32,6 +32,8 @@ function readForm() {
   state.textScale = $('textSize').value / 100;
   state.textColour = $('textColour').value;   // '' = automatic
   state.italic = $('textItalic').checked;
+  state.patternScale = $('patternScale').value / 100;
+  // state.patternImg is set when the chosen pattern's picture has loaded (see the pattern picker below)
   $('textSizeOut').textContent = `${$('textSize').value}%`;
   state.logoScale = $('logoScale').value / 100;
   state.qty = parseInt(form.querySelector('input[name=quantity]:checked').value, 10);
@@ -51,7 +53,8 @@ function area(L, W, H) {
 }
 function unitPrice(qty) {
   let u = CFG.base + area(state.L, state.W, state.H) * CFG.rate * (state.material === 'white' ? 1.15 : 1);
-  if (state.ink) u += CFG.ink;
+  if (state.patternImg) u += CFG.ink * CFG.patternFactor;   // full-colour pattern instead of one print colour
+  else if (state.ink) u += CFG.ink;
   if (state.logo || state.text) u += CFG.brand;
   const step = Math.max(0, CFG.qtys.indexOf(qty));
   return Math.round(u * CFG.factors[step] * 100) / 100;
@@ -213,11 +216,43 @@ function markWheel(wheel, hex, fromWheel) {
 }
 function setInk(hex, el) {
   $('print_colour').value = hex;
+  if (hex) clearPattern();   // a plain print colour replaces the pattern
   document.querySelectorAll('#inks [data-ink]').forEach(s => s.setAttribute('aria-pressed', String(s === el)));
   markWheel($('customInkWheel'), hex, el === null);
   refresh();
 }
 $('inks').addEventListener('click', e => { const b = e.target.closest('[data-ink]'); if (b) setInk(b.dataset.ink, b); });
+
+/* ---------- Patterns: pick one to print it all over (it replaces the plain print colour) ---------- */
+const patternImages = {};   // key → loaded Image, so switching back is instant
+function showPatternChoice(key) {
+  $('patternName').textContent = key ? `${CFG.patterns[key][0]} · full-colour print` : 'No pattern';
+  $('patternSizeRow').hidden = !key;
+}
+function clearPattern() {
+  const none = form.querySelector('input[name=pattern][value=""]');
+  if (!none.checked) none.checked = true;
+  state.patternImg = null;
+  showPatternChoice('');
+}
+function choosePattern(key) {
+  showPatternChoice(key);
+  if (!key) { state.patternImg = null; refresh(); return; }
+  // Patterns replace the print colour: go back to "no print colour"
+  const noInk = document.querySelector('#inks [data-ink=""]');
+  $('print_colour').value = '';
+  document.querySelectorAll('#inks [data-ink]').forEach(s => s.setAttribute('aria-pressed', String(s === noInk)));
+  markWheel($('customInkWheel'), '', false);
+  const use = img => {   // only if the customer hasn't picked something else while it loaded
+    if (form.querySelector('input[name=pattern]:checked')?.value === key) { state.patternImg = img; refresh(); }
+  };
+  if (patternImages[key]) return use(patternImages[key]);
+  const img = new Image();
+  img.onload = () => { patternImages[key] = img; use(img); };
+  img.src = CFG.patterns[key][1];
+}
+$('patterns').addEventListener('change', e => { if (e.target.name === 'pattern') choosePattern(e.target.value); });
+$('patternScale').addEventListener('input', e => { $('patternScaleOut').textContent = `${e.target.value}%`; });
 $('customInk').addEventListener('input', e => setInk(e.target.value, null));
 
 // Text colour: Auto, a swatch, or any colour

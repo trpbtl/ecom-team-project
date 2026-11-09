@@ -17,11 +17,18 @@ if (!$product || !$t) {
     redirect($product ? 'views/single_product.php?pro_id=' . (int) $product['product_id'] : 'views/all_products.php');
 }
 
+// Each standard pattern: its name and picture (key => [name, url])
+$patternInfo = [];
+foreach (DesignTypes::PATTERNS as $key => $name) {
+    $patternInfo[$key] = [$name, asset_url('images/patterns/' . $key . '.jpg')];
+}
+
 // Everything js/designer.js needs to draw and price this template (the server uses the same numbers)
 $config = [
     'type' => $type, 'noun' => $t['noun'], 'folds' => $t['folds'], 'fields' => $t['fields'],
     'base' => $t['base'], 'rate' => $t['rate'], 'ink' => $t['ink'], 'brand' => $t['brand'],
     'qtys' => $t['qtys'], 'factors' => DesignTypes::FACTORS, 'fonts' => DesignTypes::FONTS,
+    'patterns' => $patternInfo, 'patternFactor' => DesignTypes::PATTERN_FACTOR,
 ];
 $defaultQty = $t['qtys'][1];
 $inks = ['' => 'No print colour', '#d14615' => 'Packe orange', '#1c1a18' => 'Black', '#1f4e79' => 'Navy', '#2f6b3a' => 'Green', '#e8b4b8' => 'Blush pink'];
@@ -129,6 +136,27 @@ require __DIR__ . '/layout/header.php';
                     <span class="colour-wheel-dot" aria-hidden="true"></span>
                     <input type="color" id="customInk" value="#7a3fa0" class="colour-wheel-input"></label>
             </div>
+        </fieldset>
+
+        <fieldset>
+            <legend class="label mb-1">Pattern <span class="normal-case tracking-normal font-normal text-muted">(optional, printed all over)</span></legend>
+            <div class="grid grid-cols-5 gap-2 mt-2" id="patterns">
+                <label class="pattern-chip" title="No pattern">
+                    <input type="radio" name="pattern" value="" checked class="sr-only">
+                    <span class="pattern-swatch grid place-items-center text-xs font-semibold text-muted bg-white">None</span>
+                </label>
+                <?php foreach (DesignTypes::PATTERNS as $key => $name): ?>
+                    <label class="pattern-chip" title="<?= e($name) ?>">
+                        <input type="radio" name="pattern" value="<?= e($key) ?>" class="sr-only">
+                        <span class="pattern-swatch" style="background-image: url('<?= e(asset_url('images/patterns/' . $key . '.jpg')) ?>')"></span>
+                        <span class="sr-only"><?= e($name) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+            <p class="text-sm text-muted mt-2" id="patternName" aria-live="polite">No pattern</p>
+            <label class="flex items-center gap-3 text-sm mt-2" id="patternSizeRow" hidden>Pattern size
+                <input type="range" id="patternScale" name="pattern_scale" min="50" max="200" step="10" value="100" class="flex-1 accent-[#c2410c]">
+                <output id="patternScaleOut" for="patternScale" class="w-11 text-right tabular-nums text-muted">100%</output></label>
         </fieldset>
 
         <fieldset class="flex flex-col gap-3">

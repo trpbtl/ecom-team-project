@@ -101,5 +101,14 @@ function upgrade(mysqli $c): string
                    ADD COLUMN text_italic TINYINT NOT NULL DEFAULT 0 AFTER text_colour");
         $done[] = 'added text size, colour and italic to designs';
     }
+    $hasPattern = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                             WHERE table_schema = DATABASE() AND table_name = 'customizations' AND column_name = 'pattern'")->fetch_row()[0];
+    if (!$hasPattern) {
+        // Customers can print a standard pattern all over their packaging
+        $c->query("ALTER TABLE customizations
+                   ADD COLUMN pattern VARCHAR(30) NULL AFTER text_italic,
+                   ADD COLUMN pattern_scale SMALLINT NOT NULL DEFAULT 100 AFTER pattern");
+        $done[] = 'added patterns to designs';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

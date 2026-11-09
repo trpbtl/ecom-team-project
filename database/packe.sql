@@ -60,6 +60,8 @@ CREATE TABLE customizations (
     text_size        SMALLINT NOT NULL DEFAULT 100,   -- text size in % (60–160)
     text_colour      CHAR(7) NULL,                    -- NULL = automatic (dark or light)
     text_italic      TINYINT NOT NULL DEFAULT 0,
+    pattern          VARCHAR(30) NULL,                -- standard pattern printed all over (see DesignTypes::PATTERNS)
+    pattern_scale    SMALLINT NOT NULL DEFAULT 100,   -- pattern size in % (50–200)
     quantity         INT NOT NULL,
     unit_price       DECIMAL(10,2) NOT NULL,
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

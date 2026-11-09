@@ -96,3 +96,13 @@ table th { font-weight: 600; }
 .colour-wheel-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
 .colour-wheel.is-active { box-shadow: 0 0 0 2px var(--packe); }
 .colour-wheel:has(.colour-wheel-input:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }
+
+/* Pattern picker: square swatches showing each pattern */
+.pattern-chip { display: block; cursor: pointer; border-radius: .6rem; }
+.pattern-swatch {
+  display: block; aspect-ratio: 1; border-radius: .6rem; background-size: cover; background-position: center;
+  border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line);
+}
+.pattern-chip:hover .pattern-swatch { box-shadow: 0 0 0 1px var(--ink); }
+.pattern-chip:has(:checked) .pattern-swatch { box-shadow: 0 0 0 2px var(--packe); }
+.pattern-chip:has(:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }

@@ -110,6 +110,28 @@ class DesignTypes
     ];
     public const DEFAULT_FONT = 'archivo';
 
+    /**
+     * Standard patterns customers can print all over the outside (pictures in images/patterns/<key>.jpg).
+     * A pattern is full-colour printing, so it costs PATTERN_FACTOR times the template's print-colour charge.
+     */
+    public const PATTERNS = [
+        'henna-swirl'       => 'Henna Swirl',
+        'midnight-meadow'   => 'Midnight Meadow',
+        'confetti-branches' => 'Confetti Branches',
+        'bauhaus-blocks'    => 'Bauhaus Blocks',
+        'bold-bloom'        => 'Bold Bloom',
+        'tropical-night'    => 'Tropical Night',
+        'hexagon-garden'    => 'Hexagon Garden',
+        'ocean-waves'       => 'Ocean Waves',
+        'rainbow-rings'     => 'Rainbow Rings',
+    ];
+    public const PATTERN_FACTOR = 1.5;
+
+    public static function patternName(?string $pattern): ?string
+    {
+        return self::PATTERNS[$pattern ?? ''] ?? null;
+    }
+
     /** The Google Fonts stylesheet for every design font (pages with the 3D designer or showcase). */
     public static function fontsLink(): string
     {
@@ -163,11 +185,12 @@ class DesignTypes
 
     /** Price per unit for the quantity step $qty. Mirrors unitPrice() in js/designer.js. */
     public static function unitPrice(string $type, float $L, float $W, float $H, string $material,
-                                     bool $hasInk, bool $hasBranding, int $qty): float
+                                     bool $hasInk, bool $hasBranding, int $qty, bool $hasPattern = false): float
     {
         $t = self::TYPES[$type];
         $u = $t['base'] + self::area($type, $L, $W, $H) * $t['rate'] * ($material === 'white' ? 1.15 : 1.0);
-        if ($hasInk) $u += $t['ink'];
+        if ($hasPattern) $u += $t['ink'] * self::PATTERN_FACTOR;   // full-colour pattern instead of one print colour
+        elseif ($hasInk) $u += $t['ink'];
         if ($hasBranding) $u += $t['brand'];
         $step = array_search($qty, $t['qtys'], true);
         return round($u * self::FACTORS[$step === false ? 0 : $step], 2);

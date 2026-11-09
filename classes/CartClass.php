@@ -65,7 +65,7 @@ class CartClass extends Database
                     p.name, p.image, p.material AS product_material, p.design_type, c.category_name,
                     COALESCE(cz.unit_price, p.base_price) AS unit_price,
                     COALESCE(cz.unit_price, p.base_price) * ct.quantity AS line_total,
-                    cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text, cz.font, cz.text_size, cz.text_colour, cz.text_italic
+                    cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text, cz.font, cz.text_size, cz.text_colour, cz.text_italic, cz.pattern, cz.pattern_scale
              FROM cart ct
              JOIN products p ON p.product_id = ct.product_id
              JOIN categories c ON c.category_id = p.category_id

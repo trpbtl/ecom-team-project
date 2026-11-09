@@ -58,10 +58,15 @@ class CustomizationController
         $textColour = (string) ($in['text_colour'] ?? '');   // empty = automatic (dark or light, whichever stands out)
         if ($textColour !== '' && !preg_match(Validate::HEX, $textColour)) return Validate::fail('Choose a valid text colour.');
         $italic = !empty($in['text_italic']) ? 1 : 0;
+        $pattern = (string) ($in['pattern'] ?? '');   // empty = no pattern
+        if ($pattern !== '' && !isset(DesignTypes::PATTERNS[$pattern])) return Validate::fail('Choose a pattern from the list.');
+        $patternScale = filter_var($in['pattern_scale'] ?? 100, FILTER_VALIDATE_INT, ['options' => ['min_range' => 50, 'max_range' => 200]]);
+        if ($patternScale === false) return Validate::fail('Pattern size must be between 50% and 200%.');
+        if ($pattern !== '') $ink = '';   // a pattern replaces the plain print colour
         $qty = (int) ($in['quantity'] ?? 0);
         if (!in_array($qty, $t['qtys'], true)) return Validate::fail('Choose a quantity.');
 
-        $price = DesignTypes::unitPrice($type, $L, $W, $H, $material, $ink !== '', $logoFile !== null || $text !== '', $qty);
+        $price = DesignTypes::unitPrice($type, $L, $W, $H, $material, $ink !== '', $logoFile !== null || $text !== '', $qty, $pattern !== '');
 
         $id = $this->model->addCustomization([
             'customer_id'  => $customerId,
@@ -78,6 +83,8 @@ class CustomizationController
             'text_size'    => $textSize,
             'text_colour'  => $textColour === '' ? null : strtolower($textColour),
             'text_italic'  => $italic,
+            'pattern'      => $pattern === '' ? null : $pattern,
+            'pattern_scale' => $patternScale,
             'quantity'     => $qty,
             'unit_price'   => $price,
         ]);

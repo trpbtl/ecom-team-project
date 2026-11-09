@@ -106,7 +106,7 @@ class OrderClass extends Database
     {
         return $this->fetchAll(
             'SELECT oi.*, p.name, p.image, p.design_type, oi.unit_price * oi.quantity AS line_total,
-                    cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text, cz.font, cz.text_size, cz.text_colour, cz.text_italic
+                    cz.length_cm, cz.width_cm, cz.height_cm, cz.material, cz.print_colour, cz.logo_file, cz.brand_text, cz.font, cz.text_size, cz.text_colour, cz.text_italic, cz.pattern, cz.pattern_scale
              FROM order_items oi
              JOIN products p ON p.product_id = oi.product_id
              LEFT JOIN customizations cz ON cz.customization_id = oi.customization_id

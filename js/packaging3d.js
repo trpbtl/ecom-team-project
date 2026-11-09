@@ -32,13 +32,18 @@ const paperColour = () => state.material === 'kraft' ? '#d6b48a' : '#f4f2ee';
 function drawText(x, txt, cx, cy, size, maxW, colour) {
   if (!txt) return;
   // The customer's text colour wins; otherwise dark or light, whichever stands out on the board
-  x.fillStyle = state.textColour || colour || textColour(); x.textAlign = 'center'; x.textBaseline = 'middle';
+  // On a busy pattern, automatic text is white; every text on a pattern gets a soft shadow so it stays readable
+  const onPattern = !!state.patternImg;
+  x.fillStyle = state.textColour || colour || (onPattern ? '#ffffff' : textColour()); x.textAlign = 'center'; x.textBaseline = 'middle';
   let s = size * (state.textScale || 1);   // text size slider (0.6–1.6); still shrinks to fit the panel
   // The customer's chosen font (look.fontFamily / fontWeight), with Archivo as the fallback
   const family = state.fontFamily ? `"${state.fontFamily}", Archivo, Arial, sans-serif` : 'Archivo, Arial, sans-serif';
   const style = state.italic ? 'italic ' : '';
   do { x.font = `${style}${state.fontWeight || 700} ${s}px ${family}`; s *= 0.92; } while (x.measureText(txt).width > maxW && s > 8);
+  x.save();
+  if (onPattern) { x.shadowColor = 'rgba(0,0,0,0.6)'; x.shadowBlur = s * 0.25; }
   x.fillText(txt, cx, cy);
+  x.restore();
 }
 function drawLogo(x, cx, cy, maxW, maxH) {
   const img = state.logo; if (!img) return;
@@ -61,6 +66,29 @@ function drawBrand(x, cx, cy, bw, bh) {
  * A printed surface w × h cm. art: 'brand' (logo + text), 'logo' (logo, or text if no logo), 'text', 'blank', 'inside' (page content).
  * opts.rot180 turns the artwork round (for panels that are flipped over when folded).
  */
+/* ---------- Patterns: one repeat of the picture is PATTERN_CM wide at 100% size ---------- */
+const PATTERN_CM = 10;
+const tileCache = new Map();
+function patternTile(widthPx) {
+  const img = state.patternImg, w = Math.max(16, Math.round(widthPx)), key = img.src + '|' + w;
+  if (!tileCache.has(key)) {
+    if (tileCache.size > 40) tileCache.clear();
+    const c = document.createElement('canvas');
+    c.width = w; c.height = Math.max(16, Math.round(w * img.naturalHeight / img.naturalWidth));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    tileCache.set(key, c);
+  }
+  return tileCache.get(key);
+}
+/** Fill for the flat layout: the pattern, the print colour, or plain board. */
+const printFill = () => state.patternImg ? 'url(#pp)' : (state.ink || paperColour());
+/** The SVG pattern the flat layout's printed areas are filled with (sizes in cm, like the layout). */
+function patternDefs() {
+  const img = state.patternImg; if (!img) return '';
+  const tw = PATTERN_CM * (state.patternScale || 1), th = tw * img.naturalHeight / img.naturalWidth;
+  return `<defs><pattern id="pp" patternUnits="userSpaceOnUse" width="${tw}" height="${th}"><image href="${img.src}" width="${tw}" height="${th}" preserveAspectRatio="none"/></pattern></defs>`;
+}
+
 function artCanvas(w, h, art, opts = {}) {
   const px = Math.min(128, Math.max(28, 1024 / Math.max(w, h)));
   const c = document.createElement('canvas');
@@ -74,6 +102,10 @@ function artCanvas(w, h, art, opts = {}) {
     x.save();
     if (state.material === 'kraft') { x.globalCompositeOperation = 'multiply'; x.globalAlpha = 0.93; }   // ink soaks into brown board
     x.fillStyle = state.ink; x.fillRect(0, 0, cw, ch); x.restore();
+  }
+  if (state.patternImg) {   // a standard pattern printed all over (full colour, so it covers the board)
+    x.fillStyle = x.createPattern(patternTile(PATTERN_CM * (state.patternScale || 1) * px), 'repeat');
+    x.fillRect(0, 0, cw, ch);
   }
   if (opts.rot180) { x.translate(cw, ch); x.rotate(Math.PI); }
   if (opts.extra) opts.extra(x, cw, ch);
@@ -217,7 +249,7 @@ const BUILDERS = {
           ['Left', -L / 2 - H, -W / 2, H, W], ['Right', L / 2, -W / 2, H, W], ['Lid', -L / 2, lidTop, L, lidD],
           ['Tuck', -(L - 0.8) / 2, lidTop - tuckH, L - 0.8, tuckH],
           ['Ear', -(L / 2 - earIn) - earW, earZ, earW, earD], ['Ear', L / 2 - earIn, earZ, earW, earD],
-        ]) body += svgRect(n, x, z, w, d, state.ink || paperColour());
+        ]) body += svgRect(n, x, z, w, d, printFill());
         for (const f of [
           [-L / 2, W / 2, L / 2, W / 2], [-L / 2, -W / 2, L / 2, -W / 2], [-L / 2, -W / 2, -L / 2, W / 2], [L / 2, -W / 2, L / 2, W / 2],
           [-L / 2, -W / 2 - H, L / 2, -W / 2 - H], [-(L - 0.8) / 2, lidTop, (L - 0.8) / 2, lidTop],
@@ -260,7 +292,7 @@ const BUILDERS = {
         let body = '', x = glue;
         body += `<path d="M0 ${fl + 0.6} L${glue} ${fl} L${glue} ${fl + H} L0 ${fl + H - 0.6} Z" fill="${paperColour()}" stroke="#1c1a18" stroke-width="0.18"/>`;
         for (const [n, w] of panels) {
-          body += svgRect('Flap', x, 0, w, fl, state.ink || paperColour()) + svgRect(n, x, fl, w, H, state.ink || paperColour()) + svgRect('Flap', x, fl + H, w, fl, state.ink || paperColour());
+          body += svgRect('Flap', x, 0, w, fl, printFill()) + svgRect(n, x, fl, w, H, printFill()) + svgRect('Flap', x, fl + H, w, fl, printFill());
           body += svgFold(x, fl, x + w, fl) + svgFold(x, fl + H, x + w, fl + H) + svgFold(x, fl, x, fl + H);
           x += w;
         }
@@ -340,8 +372,8 @@ const BUILDERS = {
       dieline() {
         const c = front();
         const body = svgArt(0, 0, Wp, Hp, c) + svgRect('', 0, 0, Wp, Hp, 'none') +
-          svgRect('Gusset (base)', 0, Hp, Wp, G, state.ink || paperColour()) + svgFold(0, Hp + G / 2, Wp, Hp + G / 2) +
-          svgRect('Back', 0, Hp + G, Wp, Hp, state.ink || paperColour()) + svgFold(0, Hp, Wp, Hp) + svgFold(0, Hp + G, Wp, Hp + G);
+          svgRect('Gusset (base)', 0, Hp, Wp, G, printFill()) + svgFold(0, Hp + G / 2, Wp, Hp + G / 2) +
+          svgRect('Back', 0, Hp + G, Wp, Hp, printFill()) + svgFold(0, Hp, Wp, Hp) + svgFold(0, Hp + G, Wp, Hp + G);
         return { vb: [0, 0, Wp, 2 * Hp + G], body, note: `Front ${n1(Wp)} × ${n1(Hp)} cm, ${n1(G)} cm gusset` };
       },
     };
@@ -397,8 +429,8 @@ const BUILDERS = {
       },
       dieline() {
         const cv = artCanvas(pw, h, 'brand');
-        const body = svgRect('Inside flap (back of sheet)', 0, 0, pw, h, state.ink || paperColour()) +
-          svgRect('Back', pw, 0, pw, h, state.ink || paperColour()) + svgArt(2 * pw, 0, pw, h, cv) + svgRect('', 2 * pw, 0, pw, h, 'none') +
+        const body = svgRect('Inside flap (back of sheet)', 0, 0, pw, h, printFill()) +
+          svgRect('Back', pw, 0, pw, h, printFill()) + svgArt(2 * pw, 0, pw, h, cv) + svgRect('', 2 * pw, 0, pw, h, 'none') +
           svgFold(pw, 0, pw, h) + svgFold(2 * pw, 0, 2 * pw, h);
         return { vb: [0, 0, 3 * pw, h], body, note: `Outside of the sheet: ${n1(state.L)} × ${n1(h)} cm, folds into ${n1(pw)} cm panels` };
       },
@@ -457,7 +489,7 @@ const BUILDERS = {
       piv.lidB = flap(piv.back, Lt, Lt * 0.94, backD, -0.12, true, true);
       // Round logo sticker in the middle of the closed lid (on the back flap's printed side)
       const saved = state;
-      state = { ...saved, material: 'white', ink: saved.ink || '#1c1a18' };
+      state = { ...saved, material: 'white', ink: saved.ink || '#1c1a18', patternImg: null };
       const sc = artCanvas(stickerD, stickerD, 'sticker', {
         extra(x, cw, ch) { x.strokeStyle = 'rgba(255,255,255,0.7)'; x.lineWidth = cw * 0.015; x.beginPath(); x.arc(cw / 2, ch / 2, cw * 0.44, 0, 7); x.stroke(); },
       });
@@ -480,7 +512,7 @@ const BUILDERS = {
         piv.lidB.rotation.x = -ease(seg(p, 80, 100)) * shut;
       },
       dieline() {
-        const f = state.material === 'kraft' ? paperColour() : '#f4f2ee', yF = W / 2 + H, xR = L / 2 + H;
+        const f = state.patternImg ? 'url(#pp)' : paperColour(), yF = W / 2 + H, xR = L / 2 + H;
         let body = svgPoly('Base', [[-L / 2, -W / 2], [L / 2, -W / 2], [L / 2, W / 2], [-L / 2, W / 2]], f);
         for (const s of [1, -1]) {
           body += svgPoly(s > 0 ? 'Front' : 'Back', [[-L / 2, s * W / 2], [L / 2, s * W / 2], [Lt / 2, s * yF], [-Lt / 2, s * yF]], f);
@@ -494,7 +526,7 @@ const BUILDERS = {
         body += `<path d="M${-tongue * 0.9} ${-(yF + backD)} Q${-tongue * 0.6} ${-(yF + backD + tongue)} 0 ${-(yF + backD + tongue)} Q${tongue * 0.6} ${-(yF + backD + tongue)} ${tongue * 0.9} ${-(yF + backD)}" fill="${f}" stroke="#1c1a18" stroke-width="0.18"/>`;
         // The sticker is printed separately: shown beside the sheet
         const sx = xR + endD + stickerD * 0.9, saved = state;
-        state = { ...saved, material: 'white', ink: saved.ink || '#1c1a18' };
+        state = { ...saved, material: 'white', ink: saved.ink || '#1c1a18', patternImg: null };
         const sc = artCanvas(stickerD, stickerD, 'sticker');
         state = saved;
         body += `<defs><clipPath id="stk"><circle cx="${sx}" cy="0" r="${stickerD / 2}"/></clipPath></defs><g clip-path="url(#stk)">${svgArt(sx - stickerD / 2, -stickerD / 2, stickerD, stickerD, sc)}</g>` +
@@ -533,7 +565,7 @@ const BUILDERS = {
       fold(p) { piv.c.rotation.z = (1 - ease(seg(p, 0, 100))) * Math.PI; },
       dieline() {
         const sp = Math.max(0.3, tb);
-        const body = svgRect('Back cover', 0, 0, L, W, state.ink || paperColour()) + svgRect('', L, 0, sp, W, state.ink || paperColour()) +
+        const body = svgRect('Back cover', 0, 0, L, W, printFill()) + svgRect('', L, 0, sp, W, printFill()) +
           svgArt(L + sp, 0, L, W, artCanvas(L, W, 'brand')) + svgRect('', L + sp, 0, L, W, 'none') + svgFold(L, 0, L, W) + svgFold(L + sp, 0, L + sp, W);
         return { vb: [0, 0, 2 * L + sp, W], body, note: `Cover spread ${n1(2 * L + sp)} × ${n1(W)} cm · ${pages} pages inside` };
       },
@@ -588,7 +620,7 @@ export const ease01 = ease;
 /**
  * Set up the kit for a renderer (or null when WebGL failed: only flat layouts then).
  * kit.build(type, look) returns { group, fold(p)?, start?, view, ground, dieline(), dispose() }.
- * look = { L, W, H, material: 'kraft'|'white', ink: '#rrggbb'|'', logo: Image|null, logoScale, text, sub?, fontFamily?, fontWeight?, textScale?, textColour?, italic? }
+ * look = { L, W, H, material: 'kraft'|'white', ink: '#rrggbb'|'', logo: Image|null, logoScale, text, sub?, fontFamily?, fontWeight?, textScale?, textColour?, italic?, patternImg? (loaded Image), patternScale? }
  */
 export function createKit(r) {
   renderer = r || null;
@@ -609,7 +641,7 @@ export function createKit(r) {
       disposables = list;
       const b = BUILDERS[type]();
       const drawFlat = b.dieline;
-      b.dieline = () => { state = look; return drawFlat(); };   // flat layouts are drawn later, from this look
+      b.dieline = () => { state = look; const d = drawFlat(); d.body = patternDefs() + d.body; return d; };   // drawn later, from this look
       b.dispose = () => list.splice(0).forEach(o => o.dispose());
       return b;
     },
