@@ -206,9 +206,15 @@ $('presets').addEventListener('click', e => {
   refresh();
 });
 
+/** The colour wheel looks selected (ring + its colour in the middle) only when the colour came from it. */
+function markWheel(wheel, hex, fromWheel) {
+  wheel.classList.toggle('is-active', fromWheel);
+  wheel.querySelector('.colour-wheel-dot').style.background = fromWheel ? hex : '';
+}
 function setInk(hex, el) {
   $('print_colour').value = hex;
   document.querySelectorAll('#inks [data-ink]').forEach(s => s.setAttribute('aria-pressed', String(s === el)));
+  markWheel($('customInkWheel'), hex, el === null);
   refresh();
 }
 $('inks').addEventListener('click', e => { const b = e.target.closest('[data-ink]'); if (b) setInk(b.dataset.ink, b); });
@@ -218,6 +224,7 @@ $('customInk').addEventListener('input', e => setInk(e.target.value, null));
 function setTextColour(hex, el) {
   $('textColour').value = hex;
   document.querySelectorAll('#textColours [data-text-colour]').forEach(s => s.setAttribute('aria-pressed', String(s === el)));
+  markWheel($('customTextWheel'), hex, el === null);
   refresh();
 }
 $('textColours').addEventListener('click', e => { const b = e.target.closest('[data-text-colour]'); if (b) setTextColour(b.dataset.textColour, b); });

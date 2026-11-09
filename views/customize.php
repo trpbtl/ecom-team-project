@@ -125,8 +125,9 @@ require __DIR__ . '/layout/header.php';
                     <button type="button" class="w-9 h-9 rounded-full border-2 border-white ring-1 ring-line aria-pressed:ring-2 aria-pressed:ring-[#c2410c] <?= $hex === '' ? 'bg-[repeating-linear-gradient(45deg,#f3ede3_0_5px,#fff_5px_10px)]' : '' ?>"
                             style="<?= $hex ? 'background:' . $hex : '' ?>" data-ink="<?= $hex ?>" aria-pressed="<?= $hex === '' ? 'true' : 'false' ?>" aria-label="<?= $name ?>" title="<?= $name ?>"></button>
                 <?php endforeach; ?>
-                <label class="w-9 h-9 rounded-full overflow-hidden ring-1 ring-line cursor-pointer" title="Any colour"><span class="sr-only">Pick any colour</span>
-                    <input type="color" id="customInk" value="#7a3fa0" class="w-12 h-12 -m-1.5 cursor-pointer"></label>
+                <label class="colour-wheel w-9 h-9" id="customInkWheel" title="Pick any colour"><span class="sr-only">Pick any print colour</span>
+                    <span class="colour-wheel-dot" aria-hidden="true"></span>
+                    <input type="color" id="customInk" value="#7a3fa0" class="colour-wheel-input"></label>
             </div>
         </fieldset>
 
@@ -168,8 +169,9 @@ require __DIR__ . '/layout/header.php';
                         <button type="button" data-text-colour="<?= $hex ?>" aria-pressed="false" aria-label="<?= $name ?>" title="<?= $name ?>" style="background: <?= $hex ?>"
                                 class="w-8 h-8 rounded-full border-2 border-white ring-1 ring-line aria-pressed:ring-2 aria-pressed:ring-[#c2410c]"></button>
                     <?php endforeach; ?>
-                    <label class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-line cursor-pointer" title="Any colour"><span class="sr-only">Pick any text colour</span>
-                        <input type="color" id="customTextColour" value="#7a3fa0" class="w-11 h-11 -m-1.5 cursor-pointer"></label>
+                    <label class="colour-wheel w-8 h-8" id="customTextWheel" title="Pick any colour"><span class="sr-only">Pick any text colour</span>
+                        <span class="colour-wheel-dot" aria-hidden="true"></span>
+                        <input type="color" id="customTextColour" value="#7a3fa0" class="colour-wheel-input"></label>
                 </div>
             </div>
             <label class="flex items-center gap-2 text-sm cursor-pointer self-start">

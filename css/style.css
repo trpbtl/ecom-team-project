@@ -80,3 +80,19 @@ table th { font-weight: 600; }
 .cart-bump { animation: cart-bump .35s ease-out; }
 @keyframes cart-bump { 40% { transform: scale(1.08); } }
 @media (prefers-reduced-motion: reduce) { .toast, .cart-bump { animation: none; } }
+
+/* Custom colour: a rainbow wheel; the real colour input sits invisibly on top so a click opens the picker */
+.colour-wheel {
+  position: relative; display: inline-block; flex: none; border-radius: 999px; cursor: pointer;
+  border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line);
+  background:
+    radial-gradient(circle, rgba(255,255,255,.95) 0, rgba(255,255,255,.7) 18%, rgba(255,255,255,0) 64%),
+    conic-gradient(from 90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+.colour-wheel-dot {   /* the little marker in the middle; filled with the chosen colour once picked */
+  position: absolute; inset: 32%; border-radius: 999px; background: #fff;
+  border: 1.5px solid var(--ink); pointer-events: none;
+}
+.colour-wheel-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+.colour-wheel.is-active { box-shadow: 0 0 0 2px var(--packe); }
+.colour-wheel:has(.colour-wheel-input:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }
