@@ -91,5 +91,15 @@ function upgrade(mysqli $c): string
         $c->query('ALTER TABLE customizations ADD COLUMN font VARCHAR(20) NULL AFTER brand_text');
         $done[] = 'added the font choice to designs';
     }
+    $hasTextStyle = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                               WHERE table_schema = DATABASE() AND table_name = 'customizations' AND column_name = 'text_size'")->fetch_row()[0];
+    if (!$hasTextStyle) {
+        // Customers set the size, colour and italic style of their text
+        $c->query("ALTER TABLE customizations
+                   ADD COLUMN text_size SMALLINT NOT NULL DEFAULT 100 AFTER font,
+                   ADD COLUMN text_colour CHAR(7) NULL AFTER text_size,
+                   ADD COLUMN text_italic TINYINT NOT NULL DEFAULT 0 AFTER text_colour");
+        $done[] = 'added text size, colour and italic to designs';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

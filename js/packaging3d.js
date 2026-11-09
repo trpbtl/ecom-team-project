@@ -31,11 +31,13 @@ const paperColour = () => state.material === 'kraft' ? '#d6b48a' : '#f4f2ee';
 
 function drawText(x, txt, cx, cy, size, maxW, colour) {
   if (!txt) return;
-  x.fillStyle = colour || textColour(); x.textAlign = 'center'; x.textBaseline = 'middle';
-  let s = size;
+  // The customer's text colour wins; otherwise dark or light, whichever stands out on the board
+  x.fillStyle = state.textColour || colour || textColour(); x.textAlign = 'center'; x.textBaseline = 'middle';
+  let s = size * (state.textScale || 1);   // text size slider (0.6–1.6); still shrinks to fit the panel
   // The customer's chosen font (look.fontFamily / fontWeight), with Archivo as the fallback
   const family = state.fontFamily ? `"${state.fontFamily}", Archivo, Arial, sans-serif` : 'Archivo, Arial, sans-serif';
-  do { x.font = `${state.fontWeight || 700} ${s}px ${family}`; s *= 0.92; } while (x.measureText(txt).width > maxW && s > 8);
+  const style = state.italic ? 'italic ' : '';
+  do { x.font = `${style}${state.fontWeight || 700} ${s}px ${family}`; s *= 0.92; } while (x.measureText(txt).width > maxW && s > 8);
   x.fillText(txt, cx, cy);
 }
 function drawLogo(x, cx, cy, maxW, maxH) {
@@ -586,7 +588,7 @@ export const ease01 = ease;
 /**
  * Set up the kit for a renderer (or null when WebGL failed: only flat layouts then).
  * kit.build(type, look) returns { group, fold(p)?, start?, view, ground, dieline(), dispose() }.
- * look = { L, W, H, material: 'kraft'|'white', ink: '#rrggbb'|'', logo: Image|null, logoScale, text, sub?, fontFamily?, fontWeight? }
+ * look = { L, W, H, material: 'kraft'|'white', ink: '#rrggbb'|'', logo: Image|null, logoScale, text, sub?, fontFamily?, fontWeight?, textScale?, textColour?, italic? }
  */
 export function createKit(r) {
   renderer = r || null;

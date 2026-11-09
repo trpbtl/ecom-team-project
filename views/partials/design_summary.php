@@ -1,5 +1,5 @@
 <?php
-/** Short description of a design. Expects $it with design_type, length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text, font. */
+/** Short description of a design. Expects $it with design_type, length_cm, width_cm, height_cm, material, print_colour, logo_file, brand_text, font, text_size, text_colour, text_italic. */
 require_once __DIR__ . '/../../controllers/DesignTypes.php';
 ?>
 <?php if (!empty($it['length_cm'])): ?>
@@ -10,6 +10,12 @@ require_once __DIR__ . '/../../controllers/DesignTypes.php';
             · <span class="inline-block w-3 h-3 rounded-full align-middle border border-line" style="background: <?= e($it['print_colour']) ?>"></span> print
         <?php endif; ?>
         <?php if ($it['logo_file']): ?> · logo<?php endif; ?>
-        <?php if ($it['brand_text']): ?> · “<?= e($it['brand_text']) ?>” in <?= e(DesignTypes::fontName($it['font'] ?? null)) ?> font<?php endif; ?>
+        <?php if ($it['brand_text']): ?>
+            · “<?= e($it['brand_text']) ?>” in <?= e(DesignTypes::fontName($it['font'] ?? null)) ?> font<?=
+                !empty($it['text_italic']) ? ', italic' : '' ?><?=
+                (int) ($it['text_size'] ?? 100) !== 100 ? ', ' . (int) $it['text_size'] . '% size' : '' ?><?php if (!empty($it['text_colour'])): ?>,
+                <span class="inline-block w-3 h-3 rounded-full align-middle border border-line" style="background: <?= e($it['text_colour']) ?>"></span> text colour
+            <?php endif; ?>
+        <?php endif; ?>
     </p>
 <?php endif; ?>

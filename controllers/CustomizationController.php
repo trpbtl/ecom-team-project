@@ -53,6 +53,11 @@ class CustomizationController
         if (mb_strlen($text) > 28) return ['success' => false, 'field' => 'brand_text', 'error' => 'Text must be 28 characters or fewer.'];
         $font = (string) ($in['font'] ?? DesignTypes::DEFAULT_FONT);
         if (!isset(DesignTypes::FONTS[$font])) return Validate::fail('Choose a font.');
+        $textSize = filter_var($in['text_size'] ?? 100, FILTER_VALIDATE_INT, ['options' => ['min_range' => 60, 'max_range' => 160]]);
+        if ($textSize === false) return Validate::fail('Text size must be between 60% and 160%.');
+        $textColour = (string) ($in['text_colour'] ?? '');   // empty = automatic (dark or light, whichever stands out)
+        if ($textColour !== '' && !preg_match(Validate::HEX, $textColour)) return Validate::fail('Choose a valid text colour.');
+        $italic = !empty($in['text_italic']) ? 1 : 0;
         $qty = (int) ($in['quantity'] ?? 0);
         if (!in_array($qty, $t['qtys'], true)) return Validate::fail('Choose a quantity.');
 
@@ -70,6 +75,9 @@ class CustomizationController
             'logo_file'    => $logoFile,
             'brand_text'   => $text === '' ? null : $text,
             'font'         => $font,
+            'text_size'    => $textSize,
+            'text_colour'  => $textColour === '' ? null : strtolower($textColour),
+            'text_italic'  => $italic,
             'quantity'     => $qty,
             'unit_price'   => $price,
         ]);

@@ -29,6 +29,10 @@ function readForm() {
   state.text = $('brandText').value.trim();
   const [, family, weight] = CFG.fonts[form.querySelector('input[name=font]:checked')?.value] || [];
   state.fontFamily = family || ''; state.fontWeight = weight || 700;
+  state.textScale = $('textSize').value / 100;
+  state.textColour = $('textColour').value;   // '' = automatic
+  state.italic = $('textItalic').checked;
+  $('textSizeOut').textContent = `${$('textSize').value}%`;
   state.logoScale = $('logoScale').value / 100;
   state.qty = parseInt(form.querySelector('input[name=quantity]:checked').value, 10);
 }
@@ -209,6 +213,16 @@ function setInk(hex, el) {
 }
 $('inks').addEventListener('click', e => { const b = e.target.closest('[data-ink]'); if (b) setInk(b.dataset.ink, b); });
 $('customInk').addEventListener('input', e => setInk(e.target.value, null));
+
+// Text colour: Auto, a swatch, or any colour
+function setTextColour(hex, el) {
+  $('textColour').value = hex;
+  document.querySelectorAll('#textColours [data-text-colour]').forEach(s => s.setAttribute('aria-pressed', String(s === el)));
+  refresh();
+}
+$('textColours').addEventListener('click', e => { const b = e.target.closest('[data-text-colour]'); if (b) setTextColour(b.dataset.textColour, b); });
+$('customTextColour').addEventListener('input', e => setTextColour(e.target.value, null));
+$('textSize').addEventListener('input', e => { $('textSizeOut').textContent = `${e.target.value}%`; });
 
 $('logo').addEventListener('change', e => {
   const f = e.target.files[0];

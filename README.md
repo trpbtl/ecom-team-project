@@ -8,7 +8,7 @@ The platform is for SMEs, online retailers, restaurants, cosmetics brands and ma
 
 ## Features
 
-- **3D designer for every packaging type**: mailer boxes, takeaway food boxes (sealed with a round logo sticker), shipping cartons, stand-up pouches, labels, round stickers, tamper seals, cards, tri-fold brochures and catalogues. Set the size, material, print colour, logo, text and font (six styles, from clean to script), and watch it in 3D (boxes, brochures and catalogues fold and unfold). A flat layout view shows cut and fold lines. The templates live in `controllers/DesignTypes.php`.
+- **3D designer for every packaging type**: mailer boxes, takeaway food boxes (sealed with a round logo sticker), shipping cartons, stand-up pouches, labels, round stickers, tamper seals, cards, tri-fold brochures and catalogues. Set the size, material, print colour, logo and text, with the font (six styles, from clean to script), text size, text colour and italic, and watch it in 3D (boxes, brochures and catalogues fold and unfold). A flat layout view shows cut and fold lines. The templates live in `controllers/DesignTypes.php`.
 - **Instant pricing**: the browser shows an estimate and the server calculates the real price from size, material, print, branding and quantity step, using the same rules.
 - **Shop**: categories, search and product pages. Every product can be bought ready-made, or designed.
 - **Home page showcase**: the 3D window on the home page cycles through a mailer box, food box, pouch, carton, catalogue and sticker, using the same models as the designer (`js/packaging3d.js`).

@@ -155,6 +155,26 @@ require __DIR__ . '/layout/header.php';
                     <?php endforeach; ?>
                 </div>
             </div>
+            <label class="flex items-center gap-3 text-sm">Text size
+                <input type="range" id="textSize" name="text_size" min="60" max="160" step="5" value="100" class="flex-1 accent-[#c2410c]" aria-describedby="textSizeOut">
+                <output id="textSizeOut" for="textSize" class="w-11 text-right tabular-nums text-muted">100%</output></label>
+            <div>
+                <p class="text-sm mb-2" id="textColourLabel">Text colour</p>
+                <input type="hidden" name="text_colour" id="textColour" value="">
+                <div class="flex flex-wrap items-center gap-2" id="textColours" role="group" aria-labelledby="textColourLabel">
+                    <button type="button" data-text-colour="" aria-pressed="true" title="Automatic: dark or light, whichever stands out"
+                            class="h-8 px-3 rounded-full border border-line text-xs font-semibold aria-pressed:ring-2 aria-pressed:ring-[#c2410c]">Auto</button>
+                    <?php foreach (['#ffffff' => 'White', '#1c1a18' => 'Black', '#c2410c' => 'Packe orange', '#1f4e79' => 'Navy', '#2f6b3a' => 'Green', '#c9a227' => 'Gold'] as $hex => $name): ?>
+                        <button type="button" data-text-colour="<?= $hex ?>" aria-pressed="false" aria-label="<?= $name ?>" title="<?= $name ?>" style="background: <?= $hex ?>"
+                                class="w-8 h-8 rounded-full border-2 border-white ring-1 ring-line aria-pressed:ring-2 aria-pressed:ring-[#c2410c]"></button>
+                    <?php endforeach; ?>
+                    <label class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-line cursor-pointer" title="Any colour"><span class="sr-only">Pick any text colour</span>
+                        <input type="color" id="customTextColour" value="#7a3fa0" class="w-11 h-11 -m-1.5 cursor-pointer"></label>
+                </div>
+            </div>
+            <label class="flex items-center gap-2 text-sm cursor-pointer self-start">
+                <input type="checkbox" name="text_italic" id="textItalic" value="1" class="w-4 h-4 accent-[#c2410c]">
+                <span class="italic">Italic</span></label>
         </fieldset>
 
         <fieldset>

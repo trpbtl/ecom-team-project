@@ -10,11 +10,11 @@ class CustomizationClass extends Database
     {
         $this->execute(
             'INSERT INTO customizations (customer_id, cart_key, product_id, length_cm, width_cm, height_cm,
-                                         material, print_colour, logo_file, brand_text, font, quantity, unit_price)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            'isidddsssssid',
+                                         material, print_colour, logo_file, brand_text, font, text_size, text_colour, text_italic, quantity, unit_price)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'isidddsssssisiid',
             [$d['customer_id'], $d['cart_key'], $d['product_id'], $d['length_cm'], $d['width_cm'], $d['height_cm'],
-             $d['material'], $d['print_colour'], $d['logo_file'], $d['brand_text'], $d['font'], $d['quantity'], $d['unit_price']]
+             $d['material'], $d['print_colour'], $d['logo_file'], $d['brand_text'], $d['font'], $d['text_size'], $d['text_colour'], $d['text_italic'], $d['quantity'], $d['unit_price']]
         );
         return $this->conn->insert_id;
     }
