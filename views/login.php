@@ -10,6 +10,7 @@ require __DIR__ . '/layout/header.php';
     <p class="text-muted mt-1 mb-6">Welcome back. Your cart will be kept.</p>
     <form id="login-form" action="<?= url('actions/login_action.php') ?>" method="POST" class="card p-6 flex flex-col gap-4" novalidate data-validate="login">
         <?= csrf_field() ?>
+        <?php include __DIR__ . '/partials/google_button.php'; ?>
         <label class="field"><span>Email</span>
             <input class="input" type="email" name="email" value="<?= old('email') ?>" maxlength="100" autocomplete="email" required>
             <small class="field-error" data-error-for="email"></small></label>

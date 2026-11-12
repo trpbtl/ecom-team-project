@@ -6,7 +6,10 @@ require_once __DIR__ . '/../../controllers/OrderController.php';
 require_once __DIR__ . '/../../controllers/CustomizationController.php';
 
 $id = (int) $_SESSION['customer_id'];
-$me = (new CustomerController())->getCustomer($id);
+$cc = new CustomerController();
+$me = $cc->getCustomer($id);
+$hasPassword = $cc->hasPassword($id);
+$linked = $cc->getSocialProviders($id);   // e.g. ['google'] when they sign in with Google
 $orders = (new OrderController())->getOrdersByCustomer($id);
 $designs = (new CustomizationController())->getDesignsByCustomer($id);
 $pageTitle = 'My account';
@@ -16,11 +19,11 @@ require __DIR__ . '/../layout/header.php';
 <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
     <div>
         <h1 class="font-display font-extrabold text-3xl">My account</h1>
-        <p class="text-muted">Member since <?= e(date('F Y', strtotime($me['created_at']))) ?></p>
+        <p class="text-muted">Member since <?= e(date('F Y', strtotime($me['created_at']))) ?><?= in_array('google', $linked, true) ? ' · Signs in with Google' : '' ?></p>
     </div>
     <div class="flex flex-wrap gap-2">
         <a href="<?= url('views/account/edit_account.php') ?>" class="btn btn-ghost">Edit details</a>
-        <a href="<?= url('views/account/change_pass.php') ?>" class="btn btn-ghost">Change password</a>
+        <a href="<?= url('views/account/change_pass.php') ?>" class="btn btn-ghost"><?= $hasPassword ? 'Change password' : 'Set a password' ?></a>
     </div>
 </div>
 

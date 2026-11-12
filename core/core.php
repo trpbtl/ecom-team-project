@@ -47,6 +47,39 @@ function url(string $path = ''): string
     return BASE_URL . '/' . ltrim($path, '/');
 }
 
+/** Full address of a page, e.g. https://packe.onrender.com/actions/google_callback.php (Google needs the whole address). */
+function absolute_url(string $path = ''): string
+{
+    if (PUBLIC_URL !== '') return PUBLIC_URL . '/' . ltrim($path, '/');
+    $https = !empty($_SERVER['HTTPS']) || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    $host = preg_replace('/[^A-Za-z0-9.:\-]/', '', $_SERVER['HTTP_HOST'] ?? 'localhost');   // only host characters
+    return ($https ? 'https' : 'http') . '://' . $host . url($path);
+}
+
+/** Log a customer in: fresh session id (stops session fixation), then their details in the session. */
+function start_customer_session(array $c): void
+{
+    session_regenerate_id(true);
+    $_SESSION['customer_id'] = (int) $c['customer_id'];
+    $_SESSION['customer_name'] = $c['full_name'];
+    $_SESSION['customer_email'] = $c['email'];
+    $_SESSION['user_role'] = (int) $c['user_role'];
+}
+
+/** After logging in: back to the page that asked for it (if on this site), or the right home page for the role. */
+function redirect_after_login(): void
+{
+    $next = $_SESSION['after_login'] ?? '';
+    unset($_SESSION['after_login']);
+    if ($next !== '' && str_starts_with($next, BASE_URL . '/') && !str_contains($next, '://')) {
+        header('Location: ' . $next);
+        exit;
+    }
+    if (is_admin()) redirect('views/admin/dashboard.php');
+    if (is_delivery()) redirect('views/delivery/my_deliveries.php');
+    redirect('index.php');
+}
+
 /** URL of a script or stylesheet with a version stamp, so browsers fetch the new file after each change. */
 function asset_url(string $path): string
 {

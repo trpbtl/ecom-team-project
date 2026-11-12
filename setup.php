@@ -110,5 +110,22 @@ function upgrade(mysqli $c): string
                    ADD COLUMN pattern_scale SMALLINT NOT NULL DEFAULT 100 AFTER pattern");
         $done[] = 'added patterns to designs';
     }
+    $hasSocial = $c->query("SELECT COUNT(*) FROM information_schema.tables
+                            WHERE table_schema = DATABASE() AND table_name = 'social_logins'")->fetch_row()[0];
+    if (!$hasSocial) {
+        // Sign in with Google: link Google accounts to customers; such customers may have no password
+        $c->query("ALTER TABLE customers MODIFY password_hash VARCHAR(255) NULL");
+        $c->query("CREATE TABLE social_logins (
+                       login_id INT AUTO_INCREMENT PRIMARY KEY,
+                       customer_id INT NOT NULL,
+                       provider VARCHAR(20) NOT NULL,
+                       provider_user_id VARCHAR(255) NOT NULL,
+                       email VARCHAR(255) NULL,
+                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       UNIQUE KEY one_link (provider, provider_user_id),
+                       FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
+                   ) ENGINE=InnoDB");
+        $done[] = 'added sign in with Google';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

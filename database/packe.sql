@@ -6,7 +6,7 @@ CREATE DATABASE IF NOT EXISTS packe CHARACTER SET utf8mb4 COLLATE utf8mb4_unicod
 USE packe;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS deliveries, payments, order_items, orders, cart, customizations, products, categories, customers;
+DROP TABLE IF EXISTS social_logins, deliveries, payments, order_items, orders, cart, customizations, products, categories, customers;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- user_role: 1 = admin, 2 = customer (default), 3 = delivery staff
@@ -14,13 +14,25 @@ CREATE TABLE customers (
     customer_id    INT AUTO_INCREMENT PRIMARY KEY,
     full_name      VARCHAR(100) NOT NULL,
     email          VARCHAR(100) NOT NULL UNIQUE,
-    password_hash  VARCHAR(255) NOT NULL,
+    password_hash  VARCHAR(255) NULL,          -- NULL = signs in only with Google
     phone          VARCHAR(20)  NOT NULL,
     business_name  VARCHAR(150) NULL,
     city           VARCHAR(60)  NOT NULL,
     address        VARCHAR(255) NULL,
     user_role      TINYINT      NOT NULL DEFAULT 2,
     created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Google accounts linked to a customer (sign in with Google)
+CREATE TABLE social_logins (
+    login_id          INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id       INT NOT NULL,
+    provider          VARCHAR(20) NOT NULL,           -- 'google'
+    provider_user_id  VARCHAR(255) NOT NULL,          -- the provider's permanent id for the person ("sub")
+    email             VARCHAR(255) NULL,
+    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY one_link (provider, provider_user_id),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE categories (

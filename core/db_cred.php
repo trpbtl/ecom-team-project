@@ -31,3 +31,10 @@ define('PAYSTACK_SECRET_KEY', cfg('PAYSTACK_SECRET_KEY'));   // sk_test_...
 // Delivery fees in GH₵ (set by the team)
 define('DELIVERY_FEE_STANDARD', (float) cfg('DELIVERY_FEE_STANDARD', '20'));
 define('DELIVERY_FEE_EXPRESS',  (float) cfg('DELIVERY_FEE_EXPRESS', '50'));
+
+// Sign in with Google (free): Google Cloud Console > APIs & Services > Credentials > OAuth client ID (Web application)
+define('GOOGLE_CLIENT_ID', cfg('GOOGLE_CLIENT_ID'));
+define('GOOGLE_CLIENT_SECRET', cfg('GOOGLE_CLIENT_SECRET'));
+
+// Optional: the site's public address (e.g. https://packe.onrender.com). Worked out automatically when empty.
+define('PUBLIC_URL', rtrim(cfg('PUBLIC_URL'), '/'));

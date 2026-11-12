@@ -11,6 +11,9 @@ require __DIR__ . '/layout/header.php';
 
     <form id="register-form" action="<?= url('actions/register_action.php') ?>" method="POST" class="card p-6 grid sm:grid-cols-2 gap-4" novalidate data-validate="register">
         <?= csrf_field() ?>
+        <?php require_once __DIR__ . '/../controllers/GoogleAuthController.php'; if (GoogleAuthController::isEnabled()): ?>
+            <div class="sm:col-span-2 flex flex-col gap-4"><?php include __DIR__ . '/partials/google_button.php'; ?></div>
+        <?php endif; ?>
         <label class="field sm:col-span-2"><span>Full name</span>
             <input class="input" name="full_name" value="<?= old('full_name') ?>" maxlength="100" autocomplete="name" required>
             <small class="field-error" data-error-for="full_name"></small></label>

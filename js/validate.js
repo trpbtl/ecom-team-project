@@ -37,14 +37,15 @@
     },
     'change-pass'(f) {
       const e = {};
-      if (!f.elements.current_password.value) e.current_password = 'Enter your current password.';
+      // Accounts made with Google have no current password, so that box is not on the page
+      if (field(f, 'current_password') && !val(f, 'current_password')) e.current_password = 'Enter your current password.';
       if (!RX.password.test(f.elements.new_password.value)) e.new_password = 'At least 8 characters, including a number.';
       if (f.elements.confirm_password.value !== f.elements.new_password.value) e.confirm_password = 'The passwords do not match.';
       return e;
     },
     'delete-account'(f) {
       const e = {};
-      if (!f.elements.password.value) e.password = 'Enter your password.';
+      if (field(f, 'password') && !f.elements.password.value) e.password = 'Enter your password.';
       if (val(f, 'confirm') !== 'DELETE') e.confirm = 'Type DELETE in capitals.';
       return e;
     },

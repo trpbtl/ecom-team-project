@@ -14,22 +14,6 @@ if (!$result['success']) {
 }
 
 forget_input();
-session_regenerate_id(true);
-$c = $result['customer'];
-$_SESSION['customer_id'] = (int) $c['customer_id'];
-$_SESSION['customer_name'] = $c['full_name'];
-$_SESSION['customer_email'] = $c['email'];
-$_SESSION['user_role'] = (int) $c['user_role'];
-(new CartController())->attachCustomer(get_cart_key(), (int) $c['customer_id']);
-
-// Go back to the page that asked for login, if it was on this site
-$next = $_SESSION['after_login'] ?? '';
-unset($_SESSION['after_login']);
-if ($next !== '' && str_starts_with($next, BASE_URL . '/') && !str_contains($next, '://')) {
-    header('Location: ' . $next);
-    exit;
-}
-
-if (is_admin()) redirect('views/admin/dashboard.php');
-if (is_delivery()) redirect('views/delivery/my_deliveries.php');
-redirect('index.php');
+start_customer_session($result['customer']);
+(new CartController())->attachCustomer(get_cart_key(), (int) $result['customer']['customer_id']);
+redirect_after_login();   // back to the page that asked for login, or the home page for the role

@@ -16,7 +16,7 @@ The platform is for SMEs, online retailers, restaurants, cosmetics brands and ma
 - **Cart**: works for guests (a cookie keeps the cart) and carries over after login.
 - **Checkout with delivery**: recipient, address, and standard or express delivery.
 - **Paystack payments (test mode)**: mobile money or card in Paystack's popup. Each payment is **verified on the server** with Paystack's API before an order is recorded.
-- **Customer accounts**: register, log in, edit details, change password, delete account, order history and saved designs.
+- **Customer accounts**: register, log in (with email and password, or **Continue with Google**), edit details, change password, delete account, order history and saved designs.
 - **Admin**: dashboard, products (with image upload), categories, orders, order status, and assigning deliveries to riders.
 - **Delivery staff**: a page listing their deliveries, express first, with buttons to mark them picked up and delivered.
 
@@ -111,6 +111,22 @@ How a payment is checked (`actions/process_payment_action.php` → `OrderControl
 
 ---
 
+## Sign in with Google (optional)
+
+The "Continue with Google" button appears only once both Google keys are set.
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, then open **APIs & Services → OAuth consent screen**. Choose **External**, fill in the app name (Packe) and your email, and add the scopes `openid`, `email` and `profile`. While the app is in **Testing**, add each Google account that may sign in under **Test users**.
+2. Open **APIs & Services → Credentials → Create credentials → OAuth client ID**, type **Web application**.
+3. Under **Authorized redirect URIs**, add the address Google sends people back to:
+   - Locally: `http://localhost/packe/actions/google_callback.php`
+   - Online: `https://packe.onrender.com/actions/google_callback.php`
+4. Copy the **Client ID** and **Client secret** into `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: in `core/local_cred.php` locally (as `LOCAL_GOOGLE_...`), or in Render's environment variables online.
+5. Open `/setup.php` once so the database has the `social_logins` table.
+
+How it works (`controllers/GoogleAuthController.php`): the customer is sent to Google with a random `state` and `nonce` saved in the session. Google returns a one-time code to `actions/google_callback.php`; the server swaps it for an ID token and checks it is for this app, from Google, not expired and has the same nonce. A known Google account logs straight in; a verified email that matches a Packe account is linked to it; anyone new fills in their phone number and city once on `views/complete_signup.php`. Accounts made with Google have no password until they set one on the change-password page.
+
+---
+
 ## Put it online for free (Render + Aiven)
 
 1. **Database:** create a free **MySQL** service on [Aiven](https://aiven.io/free-tier). From its overview page, note the host, port, user and password, and download the **CA certificate** (`ca.pem`).
@@ -126,6 +142,7 @@ How a payment is checked (`actions/process_payment_action.php` → `OrderControl
    - `DB_SSL`: `true`
    - `DB_SSL_CA`: open `ca.pem` in Notepad and paste its whole text
    - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: optional, for "Continue with Google" (see above)
 5. Open the `onrender.com` address Render gives you.
 6. **After each deploy that changes the database**, open `/setup.php` on the site once. On a database that is already set up, it only adds what's missing (for example the `design_type` column) and never deletes data.
 

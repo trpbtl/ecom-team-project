@@ -18,5 +18,5 @@ if (!$result['success']) {
 }
 
 session_regenerate_id(true);
-flash('success', 'Your password has been changed.');
+flash('success', 'Your password has been saved.');
 redirect('views/account/my_account.php');

@@ -8,3 +8,8 @@ define('LOCAL_DB_NAME', 'packe');
 // From Paystack dashboard > Settings > API Keys & Webhooks (Test mode)
 define('LOCAL_PAYSTACK_PUBLIC_KEY', 'pk_test_xxxxxxxxxxxxxxxxxxxx');
 define('LOCAL_PAYSTACK_SECRET_KEY', 'sk_test_xxxxxxxxxxxxxxxxxxxx');
+
+// Sign in with Google (optional): from Google Cloud Console > Credentials > OAuth client ID
+define('LOCAL_GOOGLE_CLIENT_ID', '');
+define('LOCAL_GOOGLE_CLIENT_SECRET', '');
+
