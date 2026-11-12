@@ -15,7 +15,7 @@
             <p class="mt-1">Mobile money and card payments through Paystack (test mode in this demo).</p>
         </div>
     </div>
-    <p class="text-center text-xs text-muted pb-6">&copy; <?= date('Y') ?> Packe · E-commerce team project</p>
+    <p class="text-center text-xs text-muted pb-6">&copy; <?= date('Y') ?> Packe · E-commerce team project · <a href="<?= url('views/privacy.php') ?>" class="underline hover:text-ink">Privacy policy</a></p>
 </footer>
 
 <script src="<?= asset_url('js/validate.js') ?>"></script>

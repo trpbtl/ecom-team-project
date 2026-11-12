@@ -36,5 +36,8 @@ define('DELIVERY_FEE_EXPRESS',  (float) cfg('DELIVERY_FEE_EXPRESS', '50'));
 define('GOOGLE_CLIENT_ID', cfg('GOOGLE_CLIENT_ID'));
 define('GOOGLE_CLIENT_SECRET', cfg('GOOGLE_CLIENT_SECRET'));
 
+// Optional: an email shown on the privacy page for questions about personal data
+define('SUPPORT_EMAIL', cfg('SUPPORT_EMAIL'));
+
 // Optional: the site's public address (e.g. https://packe.onrender.com). Worked out automatically when empty.
 define('PUBLIC_URL', rtrim(cfg('PUBLIC_URL'), '/'));

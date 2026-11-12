@@ -143,6 +143,7 @@ How it works (`controllers/GoogleAuthController.php`): the customer is sent to G
    - `DB_SSL_CA`: open `ca.pem` in Notepad and paste its whole text
    - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: optional, for "Continue with Google" (see above)
+   - `SUPPORT_EMAIL`: optional, the contact email shown on the privacy policy page
 5. Open the `onrender.com` address Render gives you.
 6. **After each deploy that changes the database**, open `/setup.php` on the site once. On a database that is already set up, it only adds what's missing (for example the `design_type` column) and never deletes data.
 

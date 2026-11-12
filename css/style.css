@@ -106,3 +106,10 @@ table th { font-weight: 600; }
 .pattern-chip:hover .pattern-swatch { box-shadow: 0 0 0 1px var(--ink); }
 .pattern-chip:has(:checked) .pattern-swatch { box-shadow: 0 0 0 2px var(--packe); }
 .pattern-chip:has(:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }
+
+/* Long-form pages (privacy policy) */
+.prose-packe { line-height: 1.7; }
+.prose-packe h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.35rem; margin: 2rem 0 .5rem; }
+.prose-packe p, .prose-packe ul { margin-top: .6rem; }
+.prose-packe ul { list-style: disc; padding-left: 1.4rem; display: grid; gap: .4rem; }
+.prose-packe a { color: var(--packe-dark); font-weight: 600; text-decoration: underline; }
