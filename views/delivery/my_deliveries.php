@@ -28,7 +28,16 @@ require __DIR__ . '/../layout/header.php';
                     <p class="font-medium"><?= e($d['recipient_name']) ?></p>
                     <p><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $d['recipient_phone'])) ?>" class="text-packe-600 hover:underline"><?= e($d['recipient_phone']) ?></a></p>
                     <p class="text-muted"><?= e($d['address']) ?>, <?= e($d['city']) ?></p>
+                    <?php if (!empty($d['distance_km'])): ?><p class="text-muted"><?= e(number_format((float) $d['distance_km'], 1)) ?> km from Packe</p><?php endif; ?>
                 </div>
+                <?php if ($d['status'] !== 'delivered'): ?>
+                    <!-- Free: opens Google Maps navigation from the rider's position to the customer's pin -->
+                    <a href="<?= e(maps_directions_url($d['latitude'] ?? null, $d['longitude'] ?? null, $d['address'] . ', ' . $d['city'])) ?>"
+                       target="_blank" rel="noopener" class="btn btn-ghost w-full">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+                        Directions in Google Maps
+                    </a>
+                <?php endif; ?>
                 <?php if (isset($next[$d['status']])): ?>
                     <form action="<?= url('actions/update_delivery_status_action.php') ?>" method="POST">
                         <?= csrf_field() ?>

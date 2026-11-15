@@ -28,9 +28,18 @@ define('DB_SSL_CA', cfg('DB_SSL_CA'));                     // Aiven's CA certifi
 define('PAYSTACK_PUBLIC_KEY', cfg('PAYSTACK_PUBLIC_KEY'));   // pk_test_...
 define('PAYSTACK_SECRET_KEY', cfg('PAYSTACK_SECRET_KEY'));   // sk_test_...
 
-// Delivery fees in GH₵ (set by the team)
-define('DELIVERY_FEE_STANDARD', (float) cfg('DELIVERY_FEE_STANDARD', '20'));
-define('DELIVERY_FEE_EXPRESS',  (float) cfg('DELIVERY_FEE_EXPRESS', '50'));
+// Delivery pricing by distance from Packe (Ashesi University, Berekuso). Fees in GH₵, set by the team.
+// Standard = base + per km (road distance); express = standard × the express factor.
+define('DELIVERY_BASE', (float) cfg('DELIVERY_BASE', '25'));
+define('DELIVERY_PER_KM', (float) cfg('DELIVERY_PER_KM', '1.5'));
+define('DELIVERY_EXPRESS_FACTOR', (float) cfg('DELIVERY_EXPRESS_FACTOR', '1.8'));
+define('DELIVERY_MAX_KM', (float) cfg('DELIVERY_MAX_KM', '150'));
+define('DELIVERY_ORIGIN_LAT', (float) cfg('DELIVERY_ORIGIN_LAT', '5.7598'));    // Ashesi University
+define('DELIVERY_ORIGIN_LNG', (float) cfg('DELIVERY_ORIGIN_LNG', '-0.2197'));
+
+// Optional: OpenRouteService key (free account at openrouteservice.org, no card) for road distances.
+// Without it, Packe uses the free OSRM demo server, and if that is down, straight-line distance × 1.3.
+define('ORS_API_KEY', cfg('ORS_API_KEY'));
 
 // Sign in with Google (free): Google Cloud Console > APIs & Services > Credentials > OAuth client ID (Web application)
 define('GOOGLE_CLIENT_ID', cfg('GOOGLE_CLIENT_ID'));

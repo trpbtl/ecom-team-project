@@ -23,6 +23,10 @@ require __DIR__ . '/layout/header.php';
             your Google password, contacts, files or anything else from your Google account.</li>
         <li><b>Designs and orders:</b> the packaging you design (sizes, colours, patterns, text and any logo you upload), your cart,
             orders, and the delivery details you give at checkout (recipient name, phone number and address).</li>
+        <li><b>Delivery location:</b> at checkout you can drop a pin on the map, search for an address, or let your browser
+            share your location (only if you allow it). We keep the pin with your order so we can price and deliver it.
+            Address searches go to OpenStreetMap's Nominatim service, and the road distance is worked out with OpenRouteService or OSRM;
+            they receive the place or pin, not your name or account details.</li>
         <li><b>Payments:</b> payments are handled by <a href="https://paystack.com/terms" target="_blank" rel="noopener">Paystack</a>.
             Your card or mobile money details go to Paystack, not to us. We keep only the payment reference, amount and status.</li>
     </ul>

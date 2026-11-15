@@ -111,6 +111,26 @@ function e($value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Free Google Maps links (plain links, not the paid Maps API).
+ * With a pin: directions from wherever the rider is to the pin. Without one (older orders): a search for the address.
+ */
+function maps_directions_url($lat, $lng, string $fallbackAddress = ''): string
+{
+    if ($lat !== null && $lng !== null && $lat !== '' && $lng !== '') {
+        return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' . rawurlencode((float) $lat . ',' . (float) $lng);
+    }
+    return 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($fallbackAddress . ', Ghana');
+}
+
+function maps_place_url($lat, $lng, string $fallbackAddress = ''): string
+{
+    if ($lat !== null && $lng !== null && $lat !== '' && $lng !== '') {
+        return 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode((float) $lat . ',' . (float) $lng);
+    }
+    return 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($fallbackAddress . ', Ghana');
+}
+
 function money($amount): string
 {
     return 'GH₵' . number_format((float) $amount, 2);

@@ -127,5 +127,15 @@ function upgrade(mysqli $c): string
                    ) ENGINE=InnoDB");
         $done[] = 'added sign in with Google';
     }
+    $hasLocation = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                              WHERE table_schema = DATABASE() AND table_name = 'deliveries' AND column_name = 'latitude'")->fetch_row()[0];
+    if (!$hasLocation) {
+        // Delivery prices by distance: keep the customer's map pin and the road distance with each delivery
+        $c->query("ALTER TABLE deliveries
+                   ADD COLUMN latitude DECIMAL(9,6) NULL AFTER delivery_fee,
+                   ADD COLUMN longitude DECIMAL(9,6) NULL AFTER latitude,
+                   ADD COLUMN distance_km DECIMAL(6,1) NULL AFTER longitude");
+        $done[] = 'added delivery locations and distances';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

@@ -14,7 +14,7 @@ The platform is for SMEs, online retailers, restaurants, cosmetics brands and ma
 - **Home page showcase**: the 3D window on the home page cycles through a mailer box, food box, pouch, carton, catalogue and sticker, using the same models as the designer (`js/packaging3d.js`).
 - **Add to cart without reloading**: the cart badge updates the moment you click; the item is saved in the background (`js/cart.js`). Adding the same item again raises its quantity.
 - **Cart**: works for guests (a cookie keeps the cart) and carries over after login.
-- **Checkout with delivery**: recipient, address, and standard or express delivery.
+- **Checkout with delivery priced by distance**: customers drop a pin, search their address or use their location on a free OpenStreetMap map; Packe works out the road distance from Ashesi University and prices standard (GH₵25 + GH₵1.50 per km) and express (1.8 times) delivery. Riders get a "Directions in Google Maps" button.
 - **Paystack payments (test mode)**: mobile money or card in Paystack's popup. Each payment is **verified on the server** with Paystack's API before an order is recorded.
 - **Customer accounts**: register, log in (with email and password, or **Continue with Google**), edit details, change password, delete account, order history and saved designs.
 - **Admin**: dashboard, products (with image upload), categories, orders, order status, and assigning deliveries to riders.
@@ -144,6 +144,7 @@ How it works (`controllers/GoogleAuthController.php`): the customer is sent to G
    - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: optional, for "Continue with Google" (see above)
    - `SUPPORT_EMAIL`: optional, the contact email shown on the privacy policy page
+   - `ORS_API_KEY`: optional, a free OpenRouteService key (openrouteservice.org, no card) for road distances. Without it Packe uses the free OSRM demo server, then a straight-line estimate
 5. Open the `onrender.com` address Render gives you.
 6. **After each deploy that changes the database**, open `/setup.php` on the site once. On a database that is already set up, it only adds what's missing (for example the `design_type` column) and never deletes data.
 

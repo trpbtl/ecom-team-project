@@ -26,6 +26,11 @@ require_once __DIR__ . '/../../controllers/OrderController.php';
             <p class="label mb-1"><?= $order['delivery_option'] === 'express' ? 'Express delivery' : 'Standard delivery' ?></p>
             <p><?= e($order['recipient_name']) ?> · <?= e($order['recipient_phone']) ?></p>
             <p class="text-muted"><?= e($order['address']) ?>, <?= e($order['city']) ?></p>
+            <p class="text-muted">
+                <?php if (!empty($order['distance_km'])): ?><?= e(number_format((float) $order['distance_km'], 1)) ?> km from Packe · <?php endif; ?>
+                <a href="<?= e(maps_place_url($order['latitude'] ?? null, $order['longitude'] ?? null, $order['address'] . ', ' . $order['city'])) ?>"
+                   target="_blank" rel="noopener" class="text-packe-600 font-semibold hover:underline">View on map ↗</a>
+            </p>
             <?php if ($order['rider_name']): ?><p class="text-muted">Rider: <?= e($order['rider_name']) ?></p><?php endif; ?>
         </div>
     </div>

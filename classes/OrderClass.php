@@ -63,10 +63,12 @@ class OrderClass extends Database
             );
 
             $this->execute(
-                'INSERT INTO deliveries (order_id, recipient_name, recipient_phone, address, city, delivery_option, delivery_fee)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)',
-                'isssssd', [$orderId, $delivery['recipient_name'], $delivery['recipient_phone'], $delivery['address'],
-                            $delivery['city'], $delivery['option'], $fee]
+                'INSERT INTO deliveries (order_id, recipient_name, recipient_phone, address, city, delivery_option, delivery_fee,
+                                         latitude, longitude, distance_km)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'isssssdddd', [$orderId, $delivery['recipient_name'], $delivery['recipient_phone'], $delivery['address'],
+                            $delivery['city'], $delivery['option'], $fee,
+                            $delivery['latitude'] ?? null, $delivery['longitude'] ?? null, $delivery['distance_km'] ?? null]
             );
 
             $this->execute('DELETE FROM cart WHERE cart_key = ?', 's', [$cartKey]);
@@ -90,6 +92,7 @@ class OrderClass extends Database
         return $this->fetchOne(
             'SELECT o.*, cu.full_name, cu.email, cu.phone, cu.business_name,
                     d.delivery_id, d.recipient_name, d.recipient_phone, d.address, d.city, d.delivery_option,
+                    d.latitude, d.longitude, d.distance_km, d.delivery_fee,
                     d.status AS delivery_status, d.assigned_to, rider.full_name AS rider_name,
                     pay.channel, pay.paid_at
              FROM orders o

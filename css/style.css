@@ -132,3 +132,70 @@ table th { font-weight: 600; }
 @keyframes paid-spin { to { transform: rotate(360deg); } }
 @keyframes paid-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .paid-spinner, .paid-overlay { animation: none; } }
+
+/* ---------- Checkout: delivery map (js/delivery-map.js) ---------- */
+.step-dot {
+  display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; margin-right: .55rem; border-radius: 999px;
+  background: var(--ink); color: var(--cream); font-size: .85rem; vertical-align: .12em;
+}
+.map-frame { position: relative; border-radius: 1rem; overflow: hidden; border: 1px solid var(--line); background: var(--sand); }
+.delivery-map { height: 360px; z-index: 0; }
+@media (max-width: 640px) { .delivery-map { height: 300px; } }
+.delivery-map .leaflet-tile-pane { filter: saturate(.9) contrast(1.02); }   /* calmer map colours next to Packe orange */
+.delivery-map .leaflet-control-zoom a { color: var(--ink); }
+.delivery-map .leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,.8); }
+
+.distance-pill {
+  position: absolute; left: 12px; bottom: 12px; z-index: 500; max-width: calc(100% - 24px);
+  display: inline-flex; align-items: center; gap: .5rem; padding: .55rem .9rem; border-radius: 999px;
+  background: #fff; box-shadow: 0 6px 20px rgba(28,26,24,.18); font-size: .9rem; font-weight: 600;
+}
+.distance-pill.is-loading #distance-text { color: var(--muted); }
+.distance-pill.is-loading::after {
+  content: ""; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--packe);
+  animation: paid-spin .8s linear infinite;
+}
+.distance-pill.is-error { color: #8f1c13; }
+
+.place-results {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 1000; margin: 0; padding: .35rem; list-style: none;
+  background: #fff; border: 1px solid var(--line); border-radius: .9rem; box-shadow: 0 12px 30px rgba(28,26,24,.16);
+  max-height: 260px; overflow: auto;
+}
+.place-results button {
+  width: 100%; text-align: left; padding: .6rem .7rem; border-radius: .6rem; font-size: .9rem; line-height: 1.35;
+  display: flex; gap: .6rem; align-items: flex-start;
+}
+.place-results button:hover, .place-results button:focus-visible { background: var(--sand); outline: none; }
+.place-results .place-main { font-weight: 600; display: block; }
+.place-results .place-sub { color: var(--muted); font-size: .8rem; display: block; }
+.place-results .place-empty { padding: .6rem .7rem; color: var(--muted); font-size: .9rem; }
+
+/* Map pins: Packe's workshop (dark tile with the logo) and the customer's orange drop pin */
+.pin-origin {
+  width: 34px; height: 34px; border-radius: 10px; background: var(--ink); display: grid; place-items: center;
+  border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.pin-drop {
+  width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--packe);
+  border: 3px solid #fff; box-shadow: 0 6px 14px rgba(194,65,12,.45); display: grid; place-items: center;
+}
+.pin-drop::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #fff; }
+.leaflet-tooltip.pin-label {
+  background: var(--ink); color: var(--cream); border: 0; border-radius: 999px; padding: .2rem .6rem; font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0,0,0,.2);
+}
+.leaflet-tooltip.pin-label::before { display: none; }
+
+/* Delivery speed cards with live prices */
+.speed-card {
+  position: relative; display: flex; flex-direction: column; gap: .35rem; padding: 1rem 1.1rem; cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 1rem; background: #fff; transition: border-color .15s, box-shadow .15s;
+}
+.speed-card:hover { border-color: var(--ink); }
+.speed-card:has(:checked) { border-color: var(--packe); box-shadow: inset 0 0 0 1px var(--packe), 0 6px 18px rgba(194,65,12,.12); }
+.speed-card:has(:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }
+.speed-check { width: 1.15rem; height: 1.15rem; border-radius: 50%; border: 2px solid var(--line); flex: none; margin-top: .15rem; }
+.speed-card:has(:checked) .speed-check { border: 5px solid var(--packe); }
+.speed-price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.6rem; line-height: 1.1; color: var(--ink); }
+.speed-price.is-empty { font-size: 1rem; font-weight: 600; color: var(--muted); font-family: inherit; }

@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../classes/OrderClass.php';
 require_once __DIR__ . '/../classes/CartClass.php';
 require_once __DIR__ . '/Validate.php';
+require_once __DIR__ . '/DeliveryPricing.php';
 
 class OrderController
 {
@@ -16,12 +17,10 @@ class OrderController
         $this->model = new OrderClass();
     }
 
-    public static function deliveryFee(string $option): float
-    {
-        return $option === 'express' ? DELIVERY_FEE_EXPRESS : DELIVERY_FEE_STANDARD;
-    }
-
-    /** Validates the checkout form. Returns the delivery details to keep in the session. */
+    /**
+     * Validates the checkout form. Returns the delivery details to keep in the session.
+     * The delivery fee is worked out here from the pin's distance to Packe (DeliveryPricing), never taken from the browser.
+     */
     public function prepareCheckout(array $in, string $cartKey): array
     {
         $d = [
@@ -36,7 +35,13 @@ class OrderController
         if (!Validate::phone($d['recipient_phone']))       return Validate::fail('Enter a valid contact number for delivery.');
         if (!Validate::text($d['address'], 5, 255))        return Validate::fail('Enter the delivery address.');
         if (!Validate::text($d['city'], 2, 60))            return Validate::fail('Enter the city or town.');
-        $d['fee'] = self::deliveryFee($d['option']);
+
+        $quote = (new DeliveryPricing())->quote($in['delivery_lat'] ?? '', $in['delivery_lng'] ?? '');
+        if (!$quote['success']) return Validate::fail($quote['error']);
+        $d['latitude'] = round((float) $in['delivery_lat'], 6);
+        $d['longitude'] = round((float) $in['delivery_lng'], 6);
+        $d['distance_km'] = $quote['km'];
+        $d['fee'] = $quote[$d['option']];
         return ['success' => true, 'delivery' => $d];
     }
 

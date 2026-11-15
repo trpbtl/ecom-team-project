@@ -55,6 +55,9 @@
       if (!RX.phone.test(val(f, 'recipient_phone'))) e.recipient_phone = 'Enter a valid number (7 to 15 digits).';
       if (!len(val(f, 'address'), 5, 255)) e.address = 'Enter the delivery address.';
       if (!len(val(f, 'city'), 2, 60)) e.city = 'Enter the city or town.';
+      if (field(f, 'delivery_lat') && !val(f, 'delivery_lat')) {
+        e.delivery_location = 'Choose where we should deliver: search, use your location, or tap the map.';
+      }
       return e;
     },
     category(f) {
@@ -135,15 +138,5 @@
     }));
   });
 
-  // Checkout: update the total when the delivery speed changes
-  const checkout = document.getElementById('checkout-form');
-  if (checkout) {
-    const subtotal = parseFloat(document.getElementById('subtotal').dataset.value);
-    const fmt = v => 'GH₵' + v.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    checkout.querySelectorAll('input[name=delivery_option]').forEach(r => r.addEventListener('change', () => {
-      const fee = parseFloat(r.dataset.fee);
-      document.getElementById('delivery-fee').textContent = fmt(fee);
-      document.getElementById('grand-total').textContent = fmt(subtotal + fee);
-    }));
-  }
+  // Checkout totals now follow the delivery map (js/delivery-map.js)
 })();

@@ -47,7 +47,7 @@ require __DIR__ . '/layout/header.php';
                 </tfoot>
             </table>
         </div>
-        <p class="text-sm text-muted mt-4">Delivering to <?= e($d['recipient_name']) ?> (<?= e($d['recipient_phone']) ?>), <?= e($d['address']) ?>, <?= e($d['city']) ?>.</p>
+        <p class="text-sm text-muted mt-4">Delivering to <?= e($d['recipient_name']) ?> (<?= e($d['recipient_phone']) ?>), <?= e($d['address']) ?>, <?= e($d['city']) ?><?= isset($d['distance_km']) ? ' · ' . e(number_format((float) $d['distance_km'], 1)) . ' km from Packe' : '' ?>.</p>
     </section>
 
     <section class="card p-6 mt-6 flex flex-col gap-3">

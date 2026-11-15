@@ -141,6 +141,9 @@ CREATE TABLE deliveries (
     city             VARCHAR(60)  NOT NULL,
     delivery_option  ENUM('standard','express') NOT NULL DEFAULT 'standard',
     delivery_fee     DECIMAL(10,2) NOT NULL,
+    latitude         DECIMAL(9,6) NULL,               -- the customer's pin on the checkout map
+    longitude        DECIMAL(9,6) NULL,
+    distance_km      DECIMAL(6,1) NULL,               -- road distance from Packe (Ashesi), used for the fee
     assigned_to      INT NULL,
     status           ENUM('pending','assigned','in_transit','delivered') NOT NULL DEFAULT 'pending',
     updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
