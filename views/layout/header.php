@@ -24,6 +24,11 @@ function nav_class(string $file, string $here): string
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e(($pageTitle ?? 'Custom packaging') . ' | Packe') ?></title>
+    <!-- Favicon: SVG for modern browsers, .ico for older ones, PNG for phone home screens -->
+    <link rel="icon" href="<?= asset_url('favicon.svg') ?>" type="image/svg+xml">
+    <link rel="icon" href="<?= asset_url('favicon.ico') ?>" sizes="48x48">
+    <link rel="apple-touch-icon" href="<?= asset_url('apple-touch-icon.png') ?>">
+    <meta name="theme-color" content="#c2410c">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap">

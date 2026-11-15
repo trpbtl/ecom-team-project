@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Packe favicon: the logo's box on a cream tile, so it shows on light and dark browser tabs -->
+  <rect width="64" height="64" rx="14" fill="#fbf9f4"/>
+  <polygon points="32,7 55,19.5 32,32 9,19.5" fill="#e4572e"/>
+  <polygon points="9,19.5 32,32 32,57 9,44.5" fill="#c2410c"/>
+  <polygon points="55,19.5 32,32 32,57 55,44.5" fill="#1c1a18"/>
+</svg>
