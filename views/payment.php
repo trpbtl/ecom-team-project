@@ -61,6 +61,13 @@ require __DIR__ . '/layout/header.php';
 </div>
 
 <?php if (PAYSTACK_PUBLIC_KEY !== ''): ?>
+<!-- Shown after Paystack says the payment went through, while our server verifies it and builds the invoice -->
+<div id="paid-overlay" class="paid-overlay" role="status" aria-live="assertive" hidden>
+    <div class="paid-spinner" aria-hidden="true"></div>
+    <h2 class="paid-title">Payment received</h2>
+    <p class="paid-text">Confirming your payment with Paystack and preparing your invoice…</p>
+    <p class="paid-slow" id="paid-slow" hidden>Still working: this can take up to a minute. Please don't close this page.</p>
+</div>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
     document.getElementById('pay-button').addEventListener('click', function () {
@@ -75,6 +82,11 @@ require __DIR__ . '/layout/header.php';
             ref: <?= json_encode($checkout['reference']) ?>,   // our reference; the server checks it again
             channels: ['mobile_money', 'card'],
             callback: function (response) {
+                // Cover the page with "Payment received" while the server checks the payment (a few seconds,
+                // longer if the free server was asleep), so customers don't think it froze or pay twice
+                document.getElementById('paid-overlay').hidden = false;
+                document.body.style.overflow = 'hidden';
+                setTimeout(function () { document.getElementById('paid-slow').hidden = false; }, 15000);
                 // Not trusted on its own: process_payment_action.php verifies with Paystack's API first
                 window.location = <?= json_encode(url('actions/process_payment_action.php?ref=')) ?> + encodeURIComponent(response.reference);
             },

@@ -113,3 +113,22 @@ table th { font-weight: 600; }
 .prose-packe p, .prose-packe ul { margin-top: .6rem; }
 .prose-packe ul { list-style: disc; padding-left: 1.4rem; display: grid; gap: .4rem; }
 .prose-packe a { color: var(--packe-dark); font-weight: 600; text-decoration: underline; }
+
+/* "Payment received" overlay (views/payment.php): covers the page while the server verifies the payment */
+.paid-overlay {
+  position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .9rem; padding: 1.5rem; text-align: center;
+  background: rgba(255, 255, 255, .9); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  animation: paid-in .25s ease-out;
+}
+.paid-spinner {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 3px solid #e6e2dc; border-top-color: var(--ink);
+  animation: paid-spin .9s linear infinite;
+}
+.paid-title { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(2rem, 6vw, 2.6rem); letter-spacing: -.01em; color: var(--ink); line-height: 1.1; }
+.paid-text { max-width: 26rem; font-size: 1.05rem; line-height: 1.45; color: var(--ink); }
+.paid-slow { max-width: 26rem; font-size: .9rem; color: var(--muted); }
+@keyframes paid-spin { to { transform: rotate(360deg); } }
+@keyframes paid-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .paid-spinner, .paid-overlay { animation: none; } }
