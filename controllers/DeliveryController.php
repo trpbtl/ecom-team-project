@@ -27,6 +27,23 @@ class DeliveryController
         return ['success' => true, 'name' => $staff['full_name']];
     }
 
+    /** Record the Uber / Yango / Bolt driver an admin booked in the partner's app. */
+    public function bookPartner($orderId, array $in): array
+    {
+        $orderId = Validate::positiveInt($orderId);
+        if (!$orderId) return Validate::fail('That order was not found.');
+        $name = Validate::clean($in['driver_name'] ?? '');
+        $phone = Validate::clean($in['driver_phone'] ?? '');
+        $url = trim((string) ($in['tracking_url'] ?? ''));
+        if (!Validate::text($name, 2, 100)) return Validate::fail('Enter the driver’s name from the partner app.');
+        if (!Validate::phone($phone))       return Validate::fail('Enter the driver’s phone number (7 to 15 digits).');
+        if ($url !== '' && (strlen($url) > 255 || !preg_match('#^https://#i', $url) || filter_var($url, FILTER_VALIDATE_URL) === false)) {
+            return Validate::fail('The tracking link must be a full https:// link from the partner app.');
+        }
+        $this->model->setPartnerDriver($orderId, $name, $phone, $url === '' ? null : $url);
+        return ['success' => true, 'name' => $name];
+    }
+
     public function getDeliveriesForStaff(int $staffId): array
     {
         return $this->model->getDeliveriesForStaff($staffId);

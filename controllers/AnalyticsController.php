@@ -4,6 +4,7 @@
  * including the split of revenue between Packe's revenue streams.
  */
 require_once __DIR__ . '/../classes/AnalyticsClass.php';
+require_once __DIR__ . '/Couriers.php';
 
 class AnalyticsController
 {
@@ -29,13 +30,18 @@ class AnalyticsController
         $pro = $this->model->proTotals();
         $funnel = $this->model->designFunnel();
 
+        // Partner deliveries (Uber, Yango, Bolt) each carry Packe's fixed booking fee
+        $carriers = $this->model->carriers();
+        $partnerCount = array_sum(array_map(fn($c) => $c['carrier'] === 'packe' ? 0 : (int) $c['n'], $carriers));
+        $bookingFees = round($partnerCount * Couriers::PARTNER_FEE, 2);
         // Express costs 1.8 × standard, so 0.8/1.8 of every express fee is the rush premium
         $expressFees = (float) ($delivery['express']['fees'] ?? 0);
         $expressPremium = round($expressFees * (0.8 / 1.8), 2);
         $streams = [
             'Packaging sales'            => round((float) $orders['product_sales'] - (float) $orders['discounts'], 2),
-            'Delivery fees'              => round((float) $orders['delivery_fees'] - $expressPremium, 2),
+            'Delivery fees'              => round((float) $orders['delivery_fees'] - $expressPremium - $bookingFees, 2),
             'Express rush premium'       => $expressPremium,
+            'Partner booking fees'       => $bookingFees,
             'Packe Pro memberships'      => round((float) $pro['revenue'], 2),
         ];
 
@@ -51,6 +57,7 @@ class AnalyticsController
             'products'    => $this->model->topProducts(),
             'delivery'    => $delivery,
             'deliveryStatuses' => $this->model->deliveryStatuses(),
+            'carriers'    => $carriers,
             'riders'      => $this->model->riders(),
             'channels'    => $this->model->paymentChannels(),
             'funnel'      => $funnel,

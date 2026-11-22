@@ -17,20 +17,29 @@
 
   /* ---------- Order summary and price cards ---------- */
   function chosenOption() { return form.querySelector('input[name=delivery_option]:checked')?.value || 'standard'; }
+  function chosenCarrier() { return form.querySelector('input[name=carrier]:checked')?.value || 'packe'; }
+  const partnerFee = parseFloat(form.querySelector('[data-partner-fee]')?.dataset.partnerFee || '0');
+  // Same rule as Couriers::fee() on the server: partners add the booking fee; Pro's free delivery is for Packe riders
+  function feeFor(option) {
+    if (!quote) return null;
+    if (chosenCarrier() === 'packe') return quote[option];
+    const base = (option === 'standard' && quote.standard_full != null) ? quote.standard_full : quote[option];
+    return Math.round((base + partnerFee) * 100) / 100;
+  }
   const feeText = p => (p === 0 && quote && quote.pro) ? 'Free with Pro' : money(p);
   function paintPrices() {
     form.querySelectorAll('[data-price-for]').forEach(span => {
-      const p = quote ? quote[span.dataset.priceFor] : null;
+      const p = feeFor(span.dataset.priceFor);
       span.textContent = p != null ? feeText(p) : 'Pick a spot';
       span.classList.toggle('is-empty', p == null);
     });
-    const fee = quote ? quote[chosenOption()] : null;
+    const fee = feeFor(chosenOption());
     $('delivery-fee').textContent = fee != null ? feeText(fee) : 'Choose a spot';
     $('delivery-fee').classList.toggle('text-muted', fee == null);
     $('delivery-km').textContent = quote ? `· ${quote.km.toFixed(1)} km` : '';
     $('grand-total').textContent = money(subtotal - discount + (fee || 0));
   }
-  form.querySelectorAll('input[name=delivery_option]').forEach(r => r.addEventListener('change', paintPrices));
+  form.querySelectorAll('input[name=delivery_option], input[name=carrier]').forEach(r => r.addEventListener('change', paintPrices));
 
   function pill(text, state) {
     const p = $('distance-pill');

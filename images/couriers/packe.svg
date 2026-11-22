@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200" role="img" aria-label="Packe Delivery">
+  <!-- Packe Delivery: the Packe box on the move, in Packe orange -->
+  <rect width="300" height="200" fill="#c2410c"/>
+  <!-- speed lines -->
+  <g stroke="#fbe3d6" stroke-width="6" stroke-linecap="round" opacity=".85">
+    <line x1="20" y1="80" x2="46" y2="80"/>
+    <line x1="12" y1="98" x2="44" y2="98"/>
+    <line x1="22" y1="116" x2="46" y2="116"/>
+  </g>
+  <!-- the Packe box (isometric), tilted forward as if moving -->
+  <g transform="translate(90 100) rotate(-8)">
+    <path d="M0 -36 L33 -20 L0 -4 L-33 -20 Z" fill="#ffffff"/>
+    <path d="M-33 -20 L0 -4 L0 34 L-33 18 Z" fill="#fde4d6"/>
+    <path d="M33 -20 L0 -4 L0 34 L33 18 Z" fill="#f6c3a6"/>
+    <path d="M-16 -28 L16 -12 L16 1 L-16 -15 Z" fill="#9a330a" opacity=".55"/>
+  </g>
+  <!-- wordmark -->
+  <g font-family="'Arial Black', 'Archivo Black', Arial, sans-serif" font-weight="900" fill="#ffffff" font-style="italic">
+    <text x="140" y="100" font-size="36" letter-spacing="-1">PACKE</text>
+    <text x="141" y="128" font-size="19" letter-spacing="1">DELIVERY</text>
+  </g>
+  <!-- road -->
+  <rect x="20" y="156" width="260" height="6" rx="3" fill="#fbe3d6" opacity=".6"/>
+</svg>

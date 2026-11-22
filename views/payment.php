@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../core/core.php';
 require_login();
 require_once __DIR__ . '/../controllers/CartController.php';
+require_once __DIR__ . '/../controllers/Couriers.php';
 
 $checkout = $_SESSION['checkout'] ?? null;
 if (!$checkout) redirect('views/checkout.php');
@@ -44,7 +45,7 @@ require __DIR__ . '/layout/header.php';
                 <tfoot class="tabular-nums">
                     <tr class="border-t border-line"><td colspan="3" class="pt-3 text-right text-muted">Subtotal</td><td class="pt-3 text-right"><?= money($subtotal) ?></td></tr>
                     <?php if ($discount > 0): ?><tr><td colspan="3" class="text-right text-packe-600 font-semibold">Packe Pro: 10% off</td><td class="text-right text-packe-600 font-semibold">−<?= money($discount) ?></td></tr><?php endif; ?>
-                    <tr><td colspan="3" class="text-right text-muted"><?= $d['option'] === 'express' ? 'Express' : 'Standard' ?> delivery</td><td class="text-right"><?= (float) $d['fee'] === 0.0 ? 'Free with Pro' : money($d['fee']) ?></td></tr>
+                    <tr><td colspan="3" class="text-right text-muted"><?= $d['option'] === 'express' ? 'Express' : 'Standard' ?> delivery by <?= e(Couriers::get($d['carrier'] ?? 'packe')['name']) ?><?= Couriers::isPartner($d['carrier'] ?? 'packe') ? ' (incl. GH₵' . number_format(Couriers::PARTNER_FEE, 2) . ' booking)' : '' ?></td><td class="text-right"><?= (float) $d['fee'] === 0.0 ? 'Free with Pro' : money($d['fee']) ?></td></tr>
                     <tr><td colspan="3" class="pt-2 text-right font-semibold">Total</td><td class="pt-2 text-right font-display font-extrabold text-xl"><?= money($total) ?></td></tr>
                 </tfoot>
             </table>

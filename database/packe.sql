@@ -141,11 +141,15 @@ CREATE TABLE deliveries (
     address          VARCHAR(255) NOT NULL,
     city             VARCHAR(60)  NOT NULL,
     delivery_option  ENUM('standard','express') NOT NULL DEFAULT 'standard',
+    carrier          VARCHAR(20)  NOT NULL DEFAULT 'packe',   -- packe, uber, yango or bolt (controllers/Couriers.php)
     delivery_fee     DECIMAL(10,2) NOT NULL,
     latitude         DECIMAL(9,6) NULL,               -- the customer's pin on the checkout map
     longitude        DECIMAL(9,6) NULL,
     distance_km      DECIMAL(6,1) NULL,               -- road distance from Packe (Ashesi), used for the fee
     assigned_to      INT NULL,
+    driver_name      VARCHAR(100) NULL,               -- partner deliveries: the Uber/Yango/Bolt driver Packe booked
+    driver_phone     VARCHAR(20)  NULL,
+    tracking_url     VARCHAR(255) NULL,
     status           ENUM('pending','assigned','in_transit','delivered') NOT NULL DEFAULT 'pending',
     updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id)    REFERENCES orders(order_id) ON DELETE CASCADE,

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../controllers/CartController.php';
 require_once __DIR__ . '/../controllers/CustomerController.php';
 require_once __DIR__ . '/../controllers/DeliveryPricing.php';
 require_once __DIR__ . '/../controllers/ProController.php';
+require_once __DIR__ . '/../controllers/Couriers.php';
 
 $cc = new CartController();
 $items = $cc->getCartItems(get_cart_key());
@@ -18,6 +19,7 @@ $isPro = $pro->isActive((int) $_SESSION['customer_id']);
 $discount = $pro->discountFor($subtotal, (int) $_SESSION['customer_id']);
 $me =(new CustomerController())->getCustomer((int) $_SESSION['customer_id']);
 $chosen = ($_SESSION['old']['delivery_option'] ?? 'standard') === 'express' ? 'express' : 'standard';
+$carrier = Couriers::valid($_SESSION['old']['carrier'] ?? 'packe');
 
 // Free map pieces: Leaflet (map library) + OpenStreetMap (map pictures + address search). See js/delivery-map.js.
 $extraHead = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">';
@@ -105,6 +107,20 @@ require __DIR__ . '/layout/header.php';
                         <span class="speed-price is-empty tabular-nums" data-price-for="<?= $opt ?>">Pick a spot</span>
                         <span class="text-sm text-muted"><?= $d ?></span>
                         <span class="text-xs text-muted"><?= e($how) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Who delivers: Packe's riders or a delivery partner that Packe books for you -->
+            <h3 class="font-semibold mt-6 mb-1">Who delivers it?</h3>
+            <p class="text-sm text-muted mb-3">Choose our own riders, or let us book an Uber, Yango or Bolt driver for you (GH₵<?= number_format(Couriers::PARTNER_FEE, 2) ?> booking fee). We send you the driver’s name, phone number and tracking link.</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" data-partner-fee="<?= Couriers::PARTNER_FEE ?>">
+                <?php foreach (Couriers::LIST as $key => $c): ?>
+                    <label class="courier-card">
+                        <input type="radio" name="carrier" value="<?= $key ?>" <?= $carrier === $key ? 'checked' : '' ?> class="sr-only">
+                        <img src="<?= asset_url($c['logo']) ?>" alt="" class="courier-logo" width="150" height="100">
+                        <span class="font-semibold leading-tight"><?= e($c['name']) ?></span>
+                        <span class="text-xs text-muted"><?= $key === 'packe' ? 'Our riders' : '+ GH₵' . number_format(Couriers::PARTNER_FEE, 2) . ' booking' ?></span>
                     </label>
                 <?php endforeach; ?>
             </div>

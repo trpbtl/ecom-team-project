@@ -1,6 +1,7 @@
 <?php
 /** Invoice for one order. Expects $order (from OrderController::getOrderForViewer). */
 require_once __DIR__ . '/../../controllers/OrderController.php';
+require_once __DIR__ . '/../../controllers/Couriers.php';
 ?>
 <section class="card p-6 md:p-8">
     <div class="flex flex-wrap justify-between gap-4 border-b border-line pb-5">
@@ -31,7 +32,16 @@ require_once __DIR__ . '/../../controllers/OrderController.php';
                 <a href="<?= e(maps_place_url($order['latitude'] ?? null, $order['longitude'] ?? null, $order['address'] . ', ' . $order['city'])) ?>"
                    target="_blank" rel="noopener" class="text-packe-600 font-semibold hover:underline">View on map ↗</a>
             </p>
+            <?php $courier = Couriers::get($order['carrier'] ?? 'packe'); ?>
+            <p class="courier-chip mt-2"><img src="<?= asset_url($courier['logo']) ?>" alt=""><span>Delivered by <b><?= e($courier['name']) ?></b></span></p>
             <?php if ($order['rider_name']): ?><p class="text-muted">Rider: <?= e($order['rider_name']) ?></p><?php endif; ?>
+            <?php if (!empty($order['driver_name'])): ?>
+                <p class="text-muted mt-1">Driver: <?= e($order['driver_name']) ?>
+                    <?php if (!empty($order['driver_phone'])): ?> · <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $order['driver_phone'])) ?>" class="text-packe-600 hover:underline"><?= e($order['driver_phone']) ?></a><?php endif; ?></p>
+                <?php if (!empty($order['tracking_url'])): ?><p><a href="<?= e($order['tracking_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-packe-600 font-semibold hover:underline">Track your <?= e($courier['short']) ?> driver ↗</a></p><?php endif; ?>
+            <?php elseif (Couriers::isPartner($order['carrier'] ?? 'packe') && ($order['delivery_status'] ?? '') === 'pending'): ?>
+                <p class="text-muted mt-1">We’ll book your <?= e($courier['short']) ?> driver when your packaging is ready, and their details will appear here.</p>
+            <?php endif; ?>
         </div>
     </div>
 

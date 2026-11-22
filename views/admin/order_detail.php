@@ -4,6 +4,7 @@ require_admin();
 require_once __DIR__ . '/../../controllers/OrderController.php';
 require_once __DIR__ . '/../../controllers/CustomerController.php';
 require_once __DIR__ . '/../../controllers/DeliveryController.php';
+require_once __DIR__ . '/../../controllers/Couriers.php';
 
 $order = (new OrderController())->getOrderForViewer($_GET['order_id'] ?? null, (int) $_SESSION['customer_id'], true);
 if (!$order) {
@@ -48,6 +49,30 @@ require __DIR__ . '/../layout/header.php';
             <button class="btn btn-dark">Update status</button>
         </form>
 
+        <?php $courier = Couriers::get($order['carrier'] ?? 'packe'); ?>
+        <?php if (Couriers::isPartner($order['carrier'] ?? 'packe')): ?>
+        <!-- Partner delivery: book the ride in the partner's app, then save the driver here for the customer -->
+        <form action="<?= url('actions/book_partner_action.php') ?>" method="POST" class="card p-5 flex flex-col gap-3">
+            <?= csrf_field() ?>
+            <input type="hidden" name="order_id" value="<?= (int) $order['order_id'] ?>">
+            <div class="flex items-center gap-3">
+                <img src="<?= asset_url($courier['logo']) ?>" alt="<?= e($courier['name']) ?>" class="w-16 h-11 object-cover rounded-md">
+                <div><p class="label">Delivery partner</p><p class="font-semibold"><?= e($courier['name']) ?></p></div>
+            </div>
+            <ol class="text-sm text-muted list-decimal pl-5 flex flex-col gap-1">
+                <li>Book a delivery in the <?= e($courier['short']) ?> app from Packe (Ashesi) to the customer’s pin.</li>
+                <li>Copy the driver’s name, phone and trip link below.</li>
+            </ol>
+            <a href="<?= e($courier['app']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Open <?= e($courier['short']) ?> ↗</a>
+            <label class="field"><span>Driver’s name</span>
+                <input class="input" name="driver_name" value="<?= e($order['driver_name'] ?? '') ?>" maxlength="100" required></label>
+            <label class="field"><span>Driver’s phone</span>
+                <input class="input" type="tel" name="driver_phone" value="<?= e($order['driver_phone'] ?? '') ?>" maxlength="20" required></label>
+            <label class="field"><span>Trip tracking link (optional)</span>
+                <input class="input" type="url" name="tracking_url" value="<?= e($order['tracking_url'] ?? '') ?>" maxlength="255" placeholder="https://…"></label>
+            <button class="btn btn-dark"><?= empty($order['driver_name']) ? 'Save driver' : 'Update driver' ?></button>
+        </form>
+        <?php else: ?>
         <form action="<?= url('actions/assign_delivery_action.php') ?>" method="POST" class="card p-5 flex flex-col gap-3">
             <?= csrf_field() ?>
             <input type="hidden" name="order_id" value="<?= (int) $order['order_id'] ?>">
@@ -64,6 +89,7 @@ require __DIR__ . '/../layout/header.php';
                 <?php endif; ?></label>
             <?php if ($staff): ?><button class="btn btn-dark">Assign rider</button><?php endif; ?>
         </form>
+        <?php endif; ?>
 
         <?php if ($order['delivery_id']): ?>
         <form action="<?= url('actions/update_delivery_status_action.php') ?>" method="POST" class="card p-5 flex flex-col gap-3">

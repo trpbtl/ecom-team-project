@@ -10,7 +10,7 @@ $cartKey = get_cart_key();
 $result = (new OrderController())->prepareCheckout($_POST, $cartKey, (int) $_SESSION['customer_id']);
 
 if (!$result['success']) {
-    remember_input(['recipient_name', 'recipient_phone', 'address', 'city', 'delivery_option', 'delivery_lat', 'delivery_lng']);
+    remember_input(['recipient_name', 'recipient_phone', 'address', 'city', 'delivery_option', 'carrier', 'delivery_lat', 'delivery_lng']);
     flash('error', $result['error']);
     redirect('views/checkout.php');
 }

@@ -1,0 +1,4 @@
+# Delivery partner logos shipped with the code (not uploaded): the Packe Delivery SVG is allowed here
+<FilesMatch "^packe\.svg$">
+    Require all granted
+</FilesMatch>

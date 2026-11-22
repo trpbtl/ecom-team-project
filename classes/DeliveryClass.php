@@ -17,6 +17,17 @@ class DeliveryClass extends Database
         return true;
     }
 
+    /** A partner delivery (Uber, Yango, Bolt) that Packe booked: save the driver's details and mark it assigned. */
+    public function setPartnerDriver(int $orderId, string $name, string $phone, ?string $trackingUrl): bool
+    {
+        return $this->execute(
+            "UPDATE deliveries SET driver_name = ?, driver_phone = ?, tracking_url = ?,
+                    status = IF(status = 'pending', 'assigned', status)
+             WHERE order_id = ? AND carrier <> 'packe'",
+            'sssi', [$name, $phone, $trackingUrl, $orderId]
+        ) >= 0;
+    }
+
     public function getDeliveriesForStaff(int $staffId): array
     {
         return $this->fetchAll(

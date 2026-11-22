@@ -283,3 +283,15 @@ html.dark img[src$="logo.svg"] { filter: drop-shadow(0 0 1px rgba(255,255,255,.2
 .bar-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem .8rem; align-items: center; }
 .bar-track { grid-column: 1 / -1; height: .5rem; border-radius: 999px; background: var(--sand); overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 999px; background: #c2410c; }
+
+/* ---------- Delivery partners: Packe Delivery, Uber, Yango, Bolt (checkout, invoices, admin) ---------- */
+.courier-card {
+  display: flex; flex-direction: column; gap: .35rem; padding: .6rem; cursor: pointer; border-radius: 1rem;
+  border: 1.5px solid var(--line); background: var(--surface); transition: border-color .15s, box-shadow .15s;
+}
+.courier-card:hover { border-color: var(--ink); }
+.courier-card:has(:checked) { border-color: var(--packe); box-shadow: inset 0 0 0 1px var(--packe), 0 6px 18px rgba(194,65,12,.12); }
+.courier-card:has(:focus-visible) { outline: 2px solid var(--packe); outline-offset: 2px; }
+.courier-logo { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: .6rem; display: block; }
+.courier-chip { display: inline-flex; align-items: center; gap: .5rem; }
+.courier-chip img { width: 42px; height: 28px; object-fit: cover; border-radius: .3rem; }

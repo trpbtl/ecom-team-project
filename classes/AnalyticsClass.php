@@ -98,6 +98,16 @@ class AnalyticsClass extends Database
         );
     }
 
+    /** Who delivered: Packe riders vs Uber, Yango and Bolt (deliveries joined to orders). */
+    public function carriers(): array
+    {
+        return $this->fetchAll(
+            'SELECT d.carrier, COUNT(*) AS n, COALESCE(SUM(d.delivery_fee), 0) AS fees
+             FROM deliveries d JOIN orders o ON o.order_id = d.order_id
+             WHERE ' . self::LIVE . ' GROUP BY d.carrier ORDER BY n DESC'
+        );
+    }
+
     public function deliveryStatuses(): array
     {
         return $this->fetchAll('SELECT status, COUNT(*) AS n FROM deliveries GROUP BY status');

@@ -162,5 +162,16 @@ function upgrade(mysqli $c): string
         $c->query('ALTER TABLE orders ADD COLUMN discount DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER subtotal');
         $done[] = 'added member discounts to orders';
     }
+    $hasCarrier = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                             WHERE table_schema = DATABASE() AND table_name = 'deliveries' AND column_name = 'carrier'")->fetch_row()[0];
+    if (!$hasCarrier) {
+        // Delivery partners: Packe rider, Uber, Yango or Bolt, and the partner driver's details
+        $c->query("ALTER TABLE deliveries
+                   ADD COLUMN carrier VARCHAR(20) NOT NULL DEFAULT 'packe' AFTER delivery_option,
+                   ADD COLUMN driver_name VARCHAR(100) NULL AFTER assigned_to,
+                   ADD COLUMN driver_phone VARCHAR(20) NULL AFTER driver_name,
+                   ADD COLUMN tracking_url VARCHAR(255) NULL AFTER driver_phone");
+        $done[] = 'added delivery partners (Uber, Yango, Bolt)';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

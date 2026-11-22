@@ -118,6 +118,15 @@ require __DIR__ . '/../layout/header.php';
                 </div>
             <?php endforeach; ?>
         </div>
+        <?php if ($a['carriers']): ?>
+            <p class="label mt-4 mb-2">Who delivered</p>
+            <ul class="text-sm flex flex-col gap-2">
+                <?php foreach ($a['carriers'] as $c): $cr = Couriers::get($c['carrier']); ?>
+                    <li class="flex justify-between items-center gap-3"><span class="courier-chip"><img src="<?= asset_url($cr['logo']) ?>" alt=""><?= e($cr['name']) ?></span>
+                        <span class="tabular-nums"><?= (int) $c['n'] ?> orders · <?= money($c['fees']) ?></span></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
         <div class="flex flex-wrap gap-2 mt-4 text-sm">
             <?php foreach ($a['deliveryStatuses'] as $s): ?>
                 <span class="badge status-<?= e($s['status']) ?>"><?= e(ucfirst(str_replace('_', ' ', $s['status']))) ?>: <?= (int) $s['n'] ?></span>

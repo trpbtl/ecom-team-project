@@ -9,6 +9,7 @@ require_once __DIR__ . '/Validate.php';
 require_once __DIR__ . '/DeliveryPricing.php';
 require_once __DIR__ . '/PaystackGateway.php';
 require_once __DIR__ . '/ProController.php';
+require_once __DIR__ . '/Couriers.php';
 
 class OrderController
 {
@@ -31,6 +32,7 @@ class OrderController
             'address'         => Validate::clean($in['address'] ?? ''),
             'city'            => Validate::clean($in['city'] ?? ''),
             'option'          => ($in['delivery_option'] ?? '') === 'express' ? 'express' : 'standard',
+            'carrier'         => Couriers::valid($in['carrier'] ?? 'packe'),   // Packe rider, Uber, Yango or Bolt
         ];
         $cart = new CartClass();
         if ($cart->getCartCount($cartKey) === 0) return Validate::fail('Your cart is empty.');
@@ -45,7 +47,7 @@ class OrderController
         $d['latitude'] = round((float) $in['delivery_lat'], 6);
         $d['longitude'] = round((float) $in['delivery_lng'], 6);
         $d['distance_km'] = $quote['km'];
-        $d['fee'] = $quote[$d['option']];
+        $d['fee'] = Couriers::fee($quote, $d['option'], $d['carrier']);
         $subtotal = $cart->getCartTotal($cartKey);
         $d['discount'] = $pro->discountFor($subtotal, $customerId);   // Packe Pro: 10% off packaging
         return ['success' => true, 'delivery' => $d, 'amount' => round($subtotal - $d['discount'] + $d['fee'], 2)];
