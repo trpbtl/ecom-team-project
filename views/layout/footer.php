@@ -1,6 +1,6 @@
 </main>
 
-<footer class="border-t border-line bg-white">
+<footer class="border-t border-line bg-surface">
     <div class="max-w-7xl mx-auto px-4 py-8 grid gap-6 sm:grid-cols-3 text-sm text-muted">
         <div>
             <p class="font-display font-extrabold text-lg text-ink">Packe</p>
@@ -18,6 +18,7 @@
     <p class="text-center text-xs text-muted pb-6">&copy; <?= date('Y') ?> Packe · E-commerce team project · <a href="<?= url('views/privacy.php') ?>" class="underline hover:text-ink">Privacy policy</a></p>
 </footer>
 
+<script src="<?= asset_url('js/theme.js') ?>"></script>
 <script src="<?= asset_url('js/validate.js') ?>"></script>
 <script src="<?= asset_url('js/cart.js') ?>"></script>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>

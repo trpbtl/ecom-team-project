@@ -29,6 +29,16 @@ function nav_class(string $file, string $here): string
     <link rel="icon" href="<?= asset_url('favicon.ico') ?>" sizes="48x48">
     <link rel="apple-touch-icon" href="<?= asset_url('apple-touch-icon.png') ?>">
     <meta name="theme-color" content="#c2410c">
+    <script>
+        // Light or dark: the visitor's saved choice, else their device setting. Runs before the page paints, so no flash.
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('packe-theme'); } catch (e) {}
+            var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.classList.toggle('dark', dark);
+            document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap">
@@ -38,8 +48,12 @@ function nav_class(string $file, string $here): string
         tailwind.config = {
             theme: { extend: {
                 colors: {
-                    packe: { 50: '#fdf3ee', 100: '#fbe3d6', 500: '#d14615', 600: '#c2410c', 700: '#9a330a' },
-                    ink: '#1c1a18', cream: '#fbf9f4', sand: '#f3ede3', line: '#e6dfd3', muted: '#6b635a'
+                    // Theme colours come from CSS variables (css/style.css), so they switch with light/dark mode
+                    packe: { 50: '#fdf3ee', 100: '#fbe3d6', 500: '#d14615', 600: 'rgb(var(--packe-600) / <alpha-value>)', 700: 'rgb(var(--packe-700) / <alpha-value>)' },
+                    ink: 'rgb(var(--ink-rgb) / <alpha-value>)', cream: 'rgb(var(--cream-rgb) / <alpha-value>)',
+                    sand: 'rgb(var(--sand-rgb) / <alpha-value>)', line: 'rgb(var(--line-rgb) / <alpha-value>)',
+                    muted: 'rgb(var(--muted-rgb) / <alpha-value>)', surface: 'rgb(var(--surface-rgb) / <alpha-value>)',
+                    danger: 'rgb(var(--danger-rgb) / <alpha-value>)'
                 },
                 fontFamily: {
                     display: ['Archivo', 'Arial Narrow', 'Arial', 'sans-serif'],
@@ -52,7 +66,7 @@ function nav_class(string $file, string $here): string
 </head>
 <body class="bg-cream text-ink font-sans antialiased min-h-screen flex flex-col">
 
-<header class="bg-white border-b border-line sticky top-0 z-30">
+<header class="bg-surface border-b border-line sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-3">
         <a href="<?= url('index.php') ?>" class="flex items-center gap-2 shrink-0" aria-label="Packe home">
             <img src="<?= url('images/logo.svg') ?>" alt="" class="w-8 h-8">
@@ -81,6 +95,10 @@ function nav_class(string $file, string $here): string
         </form>
 
         <div class="flex items-center gap-4 ml-auto text-[15px]">
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </button>
             <?php if (is_logged_in()): ?>
                 <span class="hidden md:inline text-muted">Hi, <?= e(explode(' ', $_SESSION['customer_name'])[0]) ?></span>
                 <a href="<?= url('views/account/my_account.php') ?>" class="text-ink/80 hover:text-ink">My account</a>

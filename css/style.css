@@ -1,13 +1,40 @@
 /* Packe shared components. Layout and spacing use Tailwind classes in the views; these are the reusable pieces. */
+/*
+ * Theme colours. Each is stored as "R G B" so Tailwind can add opacity (see tailwind.config in header.php),
+ * and html.dark swaps them for dark mode (the toggle is js/theme.js).
+ */
 :root {
-  --packe: #c2410c;
-  --packe-dark: #9a330a;
-  --ink: #1c1a18;
-  --cream: #fbf9f4;
-  --sand: #f3ede3;
-  --line: #e6dfd3;
-  --muted: #6b635a;
+  --ink-rgb: 28 26 24;        /* text */
+  --cream-rgb: 251 249 244;   /* page background */
+  --sand-rgb: 243 237 227;    /* soft panels */
+  --line-rgb: 230 223 211;    /* borders */
+  --muted-rgb: 107 99 90;     /* secondary text */
+  --surface-rgb: 255 255 255; /* cards, inputs, header */
+  --packe-600: 194 65 12;     /* orange text and accents */
+  --packe-700: 154 51 10;
+  --danger-rgb: 180 35 24;
+
+  --packe: #c2410c;           /* orange buttons: the same in both modes, white text on top */
+  --packe-dark: rgb(var(--packe-700));
+  --ink: rgb(var(--ink-rgb));
+  --cream: rgb(var(--cream-rgb));
+  --sand: rgb(var(--sand-rgb));
+  --line: rgb(var(--line-rgb));
+  --muted: rgb(var(--muted-rgb));
+  --surface: rgb(var(--surface-rgb));
 }
+html.dark {
+  --ink-rgb: 237 231 222;
+  --cream-rgb: 22 20 18;
+  --sand-rgb: 38 34 30;
+  --line-rgb: 60 54 48;
+  --muted-rgb: 172 162 150;
+  --surface-rgb: 31 28 25;
+  --packe-600: 242 133 84;    /* lighter orange so it stays readable on dark backgrounds */
+  --packe-700: 247 160 120;
+  --danger-rgb: 248 113 113;
+}
+body { transition: background-color .2s, color .2s; }
 
 [hidden] { display: none !important; }   /* so the hidden attribute beats Tailwind's display classes */
 h1, h2, h3 { text-wrap: balance; }
@@ -30,7 +57,7 @@ h1, h2, h3 { text-wrap: balance; }
 .btn[disabled], .btn.is-loading { opacity: .6; cursor: progress; }
 
 .input, select.input, textarea.input {
-  width: 100%; background: #fff; border: 1.5px solid var(--line); border-radius: .7rem;
+  width: 100%; background: var(--surface); border: 1.5px solid var(--line); border-radius: .7rem;
   padding: .6rem .8rem; font-size: .95rem; color: var(--ink);
 }
 .input:focus { outline: none; border-color: var(--packe); box-shadow: 0 0 0 3px rgba(194, 65, 12, .15); }
@@ -39,12 +66,12 @@ h1, h2, h3 { text-wrap: balance; }
 .field > span:first-child { font-size: .9rem; font-weight: 500; }
 .field-error { color: #b42318; font-size: .82rem; min-height: 1em; }
 
-.card { background: #fff; border: 1px solid var(--line); border-radius: 1rem; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; }
 .label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
 .chip {
   display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .8rem; border-radius: .7rem;
-  border: 1.5px solid var(--line); background: #fff; font-size: .9rem;
+  border: 1.5px solid var(--line); background: var(--surface); font-size: .9rem;
 }
 .chip:hover { border-color: var(--ink); }
 .chip-active { border-color: var(--packe); box-shadow: inset 0 0 0 1px var(--packe); color: var(--packe-dark); font-weight: 600; }
@@ -118,12 +145,12 @@ table th { font-weight: 600; }
 .paid-overlay {
   position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: .9rem; padding: 1.5rem; text-align: center;
-  background: rgba(255, 255, 255, .9); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  background: rgb(var(--cream-rgb) / .92); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   animation: paid-in .25s ease-out;
 }
 .paid-spinner {
   width: 52px; height: 52px; border-radius: 50%;
-  border: 3px solid #e6e2dc; border-top-color: var(--ink);
+  border: 3px solid var(--line); border-top-color: var(--ink);
   animation: paid-spin .9s linear infinite;
 }
 .paid-title { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(2rem, 6vw, 2.6rem); letter-spacing: -.01em; color: var(--ink); line-height: 1.1; }
@@ -148,7 +175,7 @@ table th { font-weight: 600; }
 .distance-pill {
   position: absolute; left: 12px; bottom: 12px; z-index: 500; max-width: calc(100% - 24px);
   display: inline-flex; align-items: center; gap: .5rem; padding: .55rem .9rem; border-radius: 999px;
-  background: #fff; box-shadow: 0 6px 20px rgba(28,26,24,.18); font-size: .9rem; font-weight: 600;
+  background: var(--surface); box-shadow: 0 6px 20px rgba(28,26,24,.18); font-size: .9rem; font-weight: 600;
 }
 .distance-pill.is-loading #distance-text { color: var(--muted); }
 .distance-pill.is-loading::after {
@@ -159,7 +186,7 @@ table th { font-weight: 600; }
 
 .place-results {
   position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 1000; margin: 0; padding: .35rem; list-style: none;
-  background: #fff; border: 1px solid var(--line); border-radius: .9rem; box-shadow: 0 12px 30px rgba(28,26,24,.16);
+  background: var(--surface); border: 1px solid var(--line); border-radius: .9rem; box-shadow: 0 12px 30px rgba(28,26,24,.16);
   max-height: 260px; overflow: auto;
 }
 .place-results button {
@@ -190,7 +217,7 @@ table th { font-weight: 600; }
 /* Delivery speed cards with live prices */
 .speed-card {
   position: relative; display: flex; flex-direction: column; gap: .35rem; padding: 1rem 1.1rem; cursor: pointer;
-  border: 1.5px solid var(--line); border-radius: 1rem; background: #fff; transition: border-color .15s, box-shadow .15s;
+  border: 1.5px solid var(--line); border-radius: 1rem; background: var(--surface); transition: border-color .15s, box-shadow .15s;
 }
 .speed-card:hover { border-color: var(--ink); }
 .speed-card:has(:checked) { border-color: var(--packe); box-shadow: inset 0 0 0 1px var(--packe), 0 6px 18px rgba(194,65,12,.12); }
@@ -199,3 +226,33 @@ table th { font-weight: 600; }
 .speed-card:has(:checked) .speed-check { border: 5px solid var(--packe); }
 .speed-price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.6rem; line-height: 1.1; color: var(--ink); }
 .speed-price.is-empty { font-size: 1rem; font-weight: 600; color: var(--muted); font-family: inherit; }
+
+/* ---------- Light / dark mode toggle (header button, js/theme.js) ---------- */
+.theme-toggle {
+  display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px; flex: none;
+  border: 1.5px solid var(--line); color: var(--ink); background: transparent; cursor: pointer;
+  transition: border-color .15s, background-color .15s;
+}
+.theme-toggle:hover { border-color: var(--ink); }
+.theme-toggle .icon-sun { display: none; }
+html.dark .theme-toggle .icon-sun { display: block; }
+html.dark .theme-toggle .icon-moon { display: none; }
+
+/* Dark mode: the few colours that aren't theme variables */
+html.dark .btn-dark:hover { background: #fff; }
+html.dark .bg-packe-600 { background-color: #c2410c; }   /* white text sits on it, so keep the deep orange */
+/* Feature panels that are dark in light mode (bg-ink + text-cream) stay dark panels with light text */
+html.dark .bg-ink { --ink-rgb: 38 34 30; --cream-rgb: 237 231 222; }
+html.dark .bg-ink:hover { --ink-rgb: 48 43 38; }
+html.dark .alert-success { background: #13301c; color: #a8e2b6; border-color: #23583a; }
+html.dark .alert-error, html.dark .toast-error { background: #3a1613; color: #f7b8b1; border-color: #6e2a22; }
+html.dark .field-error, html.dark .distance-pill.is-error { color: #f7a39a; }
+html.dark .chip-active { color: rgb(var(--packe-600)); }
+html.dark .colour-wheel, html.dark .pattern-swatch { border-color: var(--surface); }
+html.dark img[src$="logo.svg"] { filter: drop-shadow(0 0 1px rgba(255,255,255,.25)); }
+
+/* ---------- Admin: Businesses table (views/admin/businesses.php) ---------- */
+.biz-table th, .biz-table td { padding: .8rem .75rem; vertical-align: middle; }
+.biz-table th:first-child, .biz-table td:first-child { padding-left: 0; }
+.biz-table th:last-child, .biz-table td:last-child { padding-right: 0; }
+.biz-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }

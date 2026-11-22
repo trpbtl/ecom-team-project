@@ -36,7 +36,7 @@ require __DIR__ . '/../layout/header.php';
         <?php if ($me['business_name']): ?><p><span class="text-muted block">Business</span><?= e($me['business_name']) ?></p><?php endif; ?>
         <p><span class="text-muted block">City</span><?= e($me['city']) ?></p>
         <?php if ($me['address']): ?><p><span class="text-muted block">Address</span><?= e($me['address']) ?></p><?php endif; ?>
-        <a href="<?= url('views/account/delete_account.php') ?>" class="text-red-700 hover:underline mt-2">Delete my account</a>
+        <a href="<?= url('views/account/delete_account.php') ?>" class="text-danger hover:underline mt-2">Delete my account</a>
     </section>
 
     <div class="flex flex-col gap-6 min-w-0">
