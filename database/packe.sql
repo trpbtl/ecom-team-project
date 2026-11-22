@@ -101,6 +101,7 @@ CREATE TABLE orders (
     customer_id       INT NOT NULL,
     invoice_no        VARCHAR(20) NOT NULL UNIQUE,
     subtotal          DECIMAL(10,2) NOT NULL,
+    discount          DECIMAL(10,2) NOT NULL DEFAULT 0,   -- Packe Pro members get 10% off
     delivery_fee      DECIMAL(10,2) NOT NULL,
     total_amount      DECIMAL(10,2) NOT NULL,
     order_status      ENUM('paid','processing','ready','out_for_delivery','delivered','cancelled') NOT NULL DEFAULT 'paid',
@@ -149,6 +150,21 @@ CREATE TABLE deliveries (
     updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id)    REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES customers(customer_id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Packe Pro: a paid monthly membership (10% off packaging, free standard delivery)
+CREATE TABLE subscriptions (
+    subscription_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id     INT NOT NULL,
+    plan            VARCHAR(30) NOT NULL DEFAULT 'pro_monthly',
+    amount          DECIMAL(10,2) NOT NULL,
+    channel         VARCHAR(30) NULL,
+    reference       VARCHAR(100) NOT NULL UNIQUE,
+    starts_at       DATETIME NOT NULL,
+    ends_at         DATETIME NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX (customer_id, ends_at),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Starter data: the categories and products from the Packe CMS site

@@ -9,7 +9,8 @@ if (!$checkout) redirect('views/checkout.php');
 $cc = new CartController();
 $items = $cc->getCartItems(get_cart_key());
 $subtotal = $cc->getCartTotal(get_cart_key());
-$total = round($subtotal + $checkout['delivery']['fee'], 2);
+$discount = (float) ($checkout['delivery']['discount'] ?? 0);   // Packe Pro
+$total = round($subtotal - $discount + $checkout['delivery']['fee'], 2);
 
 // If the cart changed after checkout, go back so the amount is right
 if (!$items || abs($total - $checkout['amount']) > 0.009) {
@@ -42,7 +43,8 @@ require __DIR__ . '/layout/header.php';
                 </tbody>
                 <tfoot class="tabular-nums">
                     <tr class="border-t border-line"><td colspan="3" class="pt-3 text-right text-muted">Subtotal</td><td class="pt-3 text-right"><?= money($subtotal) ?></td></tr>
-                    <tr><td colspan="3" class="text-right text-muted"><?= $d['option'] === 'express' ? 'Express' : 'Standard' ?> delivery</td><td class="text-right"><?= money($d['fee']) ?></td></tr>
+                    <?php if ($discount > 0): ?><tr><td colspan="3" class="text-right text-packe-600 font-semibold">Packe Pro: 10% off</td><td class="text-right text-packe-600 font-semibold">−<?= money($discount) ?></td></tr><?php endif; ?>
+                    <tr><td colspan="3" class="text-right text-muted"><?= $d['option'] === 'express' ? 'Express' : 'Standard' ?> delivery</td><td class="text-right"><?= (float) $d['fee'] === 0.0 ? 'Free with Pro' : money($d['fee']) ?></td></tr>
                     <tr><td colspan="3" class="pt-2 text-right font-semibold">Total</td><td class="pt-2 text-right font-display font-extrabold text-xl"><?= money($total) ?></td></tr>
                 </tfoot>
             </table>

@@ -256,3 +256,30 @@ html.dark img[src$="logo.svg"] { filter: drop-shadow(0 0 1px rgba(255,255,255,.2
 .biz-table th:first-child, .biz-table td:first-child { padding-left: 0; }
 .biz-table th:last-child, .biz-table td:last-child { padding-right: 0; }
 .biz-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ---------- Packe Pro membership (views/pro.php) ---------- */
+.pro-hero {
+  display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-end; justify-content: space-between;
+  padding: 2.5rem; border-radius: 1.5rem; color: #fff;
+  background: linear-gradient(135deg, #c2410c 0%, #9a330a 100%);
+}
+.pro-badge { display: inline-block; padding: .3rem .7rem; border-radius: 999px; background: rgba(255,255,255,.18);
+  font-size: .75rem; font-weight: 800; letter-spacing: .14em; }
+.pro-price { text-align: right; }
+@media (max-width: 640px) { .pro-hero { padding: 1.6rem; } .pro-price { text-align: left; } }
+.pro-chip { display: inline-block; margin-left: .3rem; padding: .05rem .4rem; border-radius: .35rem; background: #c2410c; color: #fff;
+  font-size: .68rem; font-weight: 800; letter-spacing: .08em; vertical-align: .1em; }
+.pro-hint { display: block; padding: .7rem .85rem; border-radius: .8rem; font-size: .85rem; line-height: 1.4;
+  background: rgb(var(--packe-600) / .08); border: 1px dashed rgb(var(--packe-600) / .45); color: var(--ink); }
+.pro-hint:hover { background: rgb(var(--packe-600) / .14); }
+.pro-hint b { color: rgb(var(--packe-600)); }
+
+/* ---------- Admin analytics (views/admin/analytics.php) ---------- */
+.kpi { display: flex; flex-direction: column; gap: .2rem; padding: 1.1rem 1.2rem; }
+.kpi-value { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.65rem; line-height: 1.1; }
+.kpi-label { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kpi-sub { font-size: .8rem; color: var(--muted); }
+.chart-box { position: relative; height: 260px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem .8rem; align-items: center; }
+.bar-track { grid-column: 1 / -1; height: .5rem; border-radius: 999px; background: var(--sand); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; background: #c2410c; }

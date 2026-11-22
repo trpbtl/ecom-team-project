@@ -137,5 +137,30 @@ function upgrade(mysqli $c): string
                    ADD COLUMN distance_km DECIMAL(6,1) NULL AFTER longitude");
         $done[] = 'added delivery locations and distances';
     }
+    $hasSubs = $c->query("SELECT COUNT(*) FROM information_schema.tables
+                          WHERE table_schema = DATABASE() AND table_name = 'subscriptions'")->fetch_row()[0];
+    if (!$hasSubs) {
+        // Packe Pro: a paid monthly membership (recurring revenue), and the discount it gives on each order
+        $c->query("CREATE TABLE subscriptions (
+                       subscription_id INT AUTO_INCREMENT PRIMARY KEY,
+                       customer_id     INT NOT NULL,
+                       plan            VARCHAR(30) NOT NULL DEFAULT 'pro_monthly',
+                       amount          DECIMAL(10,2) NOT NULL,
+                       channel         VARCHAR(30) NULL,
+                       reference       VARCHAR(100) NOT NULL UNIQUE,
+                       starts_at       DATETIME NOT NULL,
+                       ends_at         DATETIME NOT NULL,
+                       created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       INDEX (customer_id, ends_at),
+                       FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
+                   ) ENGINE=InnoDB");
+        $done[] = 'added Packe Pro memberships';
+    }
+    $hasDiscount = $c->query("SELECT COUNT(*) FROM information_schema.columns
+                              WHERE table_schema = DATABASE() AND table_name = 'orders' AND column_name = 'discount'")->fetch_row()[0];
+    if (!$hasDiscount) {
+        $c->query('ALTER TABLE orders ADD COLUMN discount DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER subtotal');
+        $done[] = 'added member discounts to orders';
+    }
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

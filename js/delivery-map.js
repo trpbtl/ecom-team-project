@@ -12,21 +12,23 @@
   const origin = [parseFloat(el.dataset.originLat), parseFloat(el.dataset.originLng)];
   const money = v => 'GH₵' + v.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const subtotal = parseFloat($('subtotal').dataset.value);
+  const discount = parseFloat($('pro-discount')?.dataset.value || '0');   // Packe Pro members: 10% off
   let quote = null;   // the last good answer from the server
 
   /* ---------- Order summary and price cards ---------- */
   function chosenOption() { return form.querySelector('input[name=delivery_option]:checked')?.value || 'standard'; }
+  const feeText = p => (p === 0 && quote && quote.pro) ? 'Free with Pro' : money(p);
   function paintPrices() {
     form.querySelectorAll('[data-price-for]').forEach(span => {
       const p = quote ? quote[span.dataset.priceFor] : null;
-      span.textContent = p != null ? money(p) : 'Pick a spot';
+      span.textContent = p != null ? feeText(p) : 'Pick a spot';
       span.classList.toggle('is-empty', p == null);
     });
     const fee = quote ? quote[chosenOption()] : null;
-    $('delivery-fee').textContent = fee != null ? money(fee) : 'Choose a spot';
+    $('delivery-fee').textContent = fee != null ? feeText(fee) : 'Choose a spot';
     $('delivery-fee').classList.toggle('text-muted', fee == null);
     $('delivery-km').textContent = quote ? `· ${quote.km.toFixed(1)} km` : '';
-    $('grand-total').textContent = money(subtotal + (fee || 0));
+    $('grand-total').textContent = money(subtotal - discount + (fee || 0));
   }
   form.querySelectorAll('input[name=delivery_option]').forEach(r => r.addEventListener('change', paintPrices));
 

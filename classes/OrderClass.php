@@ -33,8 +33,9 @@ class OrderClass extends Database
                 $subtotal += $it['unit_price'] * $it['quantity'];
             }
             $subtotal = round($subtotal, 2);
+            $discount = round((float) ($delivery['discount'] ?? 0), 2);   // Packe Pro members' 10% off
             $fee = round((float) $delivery['fee'], 2);
-            $total = round($subtotal + $fee, 2);
+            $total = round($subtotal - $discount + $fee, 2);
             if (abs($total - $paidAmount) > 0.009) {
                 throw new RuntimeException("Paid amount $paidAmount does not match order total $total.");
             }
@@ -44,9 +45,9 @@ class OrderClass extends Database
             } while ($this->fetchOne('SELECT order_id FROM orders WHERE invoice_no = ?', 's', [$invoice]));
 
             $this->execute(
-                'INSERT INTO orders (customer_id, invoice_no, subtotal, delivery_fee, total_amount, order_status, payment_reference)
-                 VALUES (?, ?, ?, ?, ?, \'paid\', ?)',
-                'isddds', [$customerId, $invoice, $subtotal, $fee, $total, $reference]
+                'INSERT INTO orders (customer_id, invoice_no, subtotal, discount, delivery_fee, total_amount, order_status, payment_reference)
+                 VALUES (?, ?, ?, ?, ?, ?, \'paid\', ?)',
+                'isdddds', [$customerId, $invoice, $subtotal, $discount, $fee, $total, $reference]
             );
             $orderId = $this->conn->insert_id;
 

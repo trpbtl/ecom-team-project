@@ -4,6 +4,7 @@
  * Set $pageTitle before including. No SQL here: cart numbers come from CartController.
  */
 require_once __DIR__ . '/../../controllers/CartController.php';
+require_once __DIR__ . '/../../controllers/ProController.php';
 
 $__cart = new CartController();
 $__key = get_cart_key();
@@ -13,6 +14,7 @@ $cartTotal = $__sum['total'];
 $flashSuccess = take_flash('success');
 $flashError = take_flash('error');
 $__here = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$__isPro = is_logged_in() && (new ProController())->isActive((int) $_SESSION['customer_id']);
 function nav_class(string $file, string $here): string
 {
     return $file === $here ? 'text-packe-600 font-semibold' : 'text-ink/80 hover:text-ink';
@@ -76,12 +78,16 @@ function nav_class(string $file, string $here): string
         <nav class="flex items-center gap-5 text-[15px]" aria-label="Main">
             <a href="<?= url('views/all_products.php') ?>" class="<?= nav_class('all_products.php', $__here) ?>">Shop</a>
             <a href="<?= url('views/customize.php') ?>" class="<?= nav_class('customize.php', $__here) ?>">Design packaging</a>
+            <?php if (!is_admin() && !is_delivery()): ?>
+                <a href="<?= url('views/pro.php') ?>" class="<?= nav_class('pro.php', $__here) ?>">Packe Pro</a>
+            <?php endif; ?>
             <?php if (is_admin()): ?>
                 <a href="<?= url('views/admin/dashboard.php') ?>" class="<?= nav_class('dashboard.php', $__here) ?>">Dashboard</a>
                 <a href="<?= url('views/admin/orders.php') ?>" class="<?= nav_class('orders.php', $__here) ?>">Orders</a>
                 <a href="<?= url('views/admin/product.php') ?>" class="<?= nav_class('product.php', $__here) ?>">Products</a>
                 <a href="<?= url('views/admin/category.php') ?>" class="<?= nav_class('category.php', $__here) ?>">Categories</a>
                 <a href="<?= url('views/admin/businesses.php') ?>" class="<?= nav_class('businesses.php', $__here) ?>">Businesses</a>
+                <a href="<?= url('views/admin/analytics.php') ?>" class="<?= nav_class('analytics.php', $__here) ?>">Analytics</a>
             <?php endif; ?>
             <?php if (is_delivery()): ?>
                 <a href="<?= url('views/delivery/my_deliveries.php') ?>" class="<?= nav_class('my_deliveries.php', $__here) ?>">My deliveries</a>
@@ -100,7 +106,7 @@ function nav_class(string $file, string $here): string
                 <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
             </button>
             <?php if (is_logged_in()): ?>
-                <span class="hidden md:inline text-muted">Hi, <?= e(explode(' ', $_SESSION['customer_name'])[0]) ?></span>
+                <span class="hidden md:inline text-muted">Hi, <?= e(explode(' ', $_SESSION['customer_name'])[0]) ?><?php if ($__isPro): ?> <a href="<?= url('views/pro.php') ?>" class="pro-chip" title="Packe Pro member">PRO</a><?php endif; ?></span>
                 <a href="<?= url('views/account/my_account.php') ?>" class="text-ink/80 hover:text-ink">My account</a>
                 <a href="<?= url('logout.php') ?>" class="text-ink/80 hover:text-ink">Log out</a>
             <?php else: ?>

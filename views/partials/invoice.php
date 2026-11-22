@@ -60,7 +60,10 @@ require_once __DIR__ . '/../../controllers/OrderController.php';
             </tbody>
             <tfoot class="tabular-nums">
                 <tr class="border-t border-line"><td colspan="3" class="pt-3 text-right text-muted">Subtotal</td><td class="pt-3 text-right"><?= money($order['subtotal']) ?></td></tr>
-                <tr><td colspan="3" class="text-right text-muted">Delivery</td><td class="text-right"><?= money($order['delivery_fee']) ?></td></tr>
+                <?php if ((float) ($order['discount'] ?? 0) > 0): ?>
+                    <tr><td colspan="3" class="text-right text-packe-600 font-semibold">Packe Pro: 10% off</td><td class="text-right text-packe-600 font-semibold">−<?= money($order['discount']) ?></td></tr>
+                <?php endif; ?>
+                <tr><td colspan="3" class="text-right text-muted">Delivery</td><td class="text-right"><?= (float) $order['delivery_fee'] === 0.0 ? 'Free (Pro)' : money($order['delivery_fee']) ?></td></tr>
                 <tr><td colspan="3" class="pt-2 text-right font-semibold">Total paid</td><td class="pt-2 text-right font-display font-extrabold text-lg"><?= money($order['total_amount']) ?></td></tr>
             </tfoot>
         </table>

@@ -7,6 +7,8 @@ require_once __DIR__ . '/../classes/OrderClass.php';
 require_once __DIR__ . '/../classes/CartClass.php';
 require_once __DIR__ . '/Validate.php';
 require_once __DIR__ . '/DeliveryPricing.php';
+require_once __DIR__ . '/PaystackGateway.php';
+require_once __DIR__ . '/ProController.php';
 
 class OrderController
 {
@@ -21,7 +23,7 @@ class OrderController
      * Validates the checkout form. Returns the delivery details to keep in the session.
      * The delivery fee is worked out here from the pin's distance to Packe (DeliveryPricing), never taken from the browser.
      */
-    public function prepareCheckout(array $in, string $cartKey): array
+    public function prepareCheckout(array $in, string $cartKey, int $customerId = 0): array
     {
         $d = [
             'recipient_name'  => Validate::clean($in['recipient_name'] ?? ''),
@@ -30,53 +32,23 @@ class OrderController
             'city'            => Validate::clean($in['city'] ?? ''),
             'option'          => ($in['delivery_option'] ?? '') === 'express' ? 'express' : 'standard',
         ];
-        if ((new CartClass())->getCartCount($cartKey) === 0) return Validate::fail('Your cart is empty.');
+        $cart = new CartClass();
+        if ($cart->getCartCount($cartKey) === 0) return Validate::fail('Your cart is empty.');
         if (!Validate::text($d['recipient_name'], 2, 100)) return Validate::fail('Enter the name of the person receiving the order.');
         if (!Validate::phone($d['recipient_phone']))       return Validate::fail('Enter a valid contact number for delivery.');
         if (!Validate::text($d['address'], 5, 255))        return Validate::fail('Enter the delivery address.');
         if (!Validate::text($d['city'], 2, 60))            return Validate::fail('Enter the city or town.');
 
-        $quote = (new DeliveryPricing())->quote($in['delivery_lat'] ?? '', $in['delivery_lng'] ?? '');
+        $pro = new ProController();
+        $quote = $pro->applyToQuote((new DeliveryPricing())->quote($in['delivery_lat'] ?? '', $in['delivery_lng'] ?? ''), $customerId);
         if (!$quote['success']) return Validate::fail($quote['error']);
         $d['latitude'] = round((float) $in['delivery_lat'], 6);
         $d['longitude'] = round((float) $in['delivery_lng'], 6);
         $d['distance_km'] = $quote['km'];
         $d['fee'] = $quote[$d['option']];
-        return ['success' => true, 'delivery' => $d];
-    }
-
-    /** Ask Paystack whether a payment really happened. Returns Paystack's "data" object or null. */
-    private function verifyWithPaystack(string $reference): ?array
-    {
-        if (PAYSTACK_SECRET_KEY === '') {
-            log_error('PAYSTACK_SECRET_KEY is not set.');
-            return null;
-        }
-        $url = 'https://api.paystack.co/transaction/verify/' . rawurlencode($reference);
-        $auth = 'Authorization: Bearer ' . PAYSTACK_SECRET_KEY;
-        if (function_exists('curl_init')) {
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER     => [$auth],
-                CURLOPT_TIMEOUT        => 20,
-            ]);
-            $body = curl_exec($ch);
-            $err = curl_error($ch);
-            curl_close($ch);
-        } else {
-            // Some XAMPP setups load PHP without the curl extension; PHP's own HTTPS streams work too
-            $body = @file_get_contents($url, false, stream_context_create([
-                'http' => ['method' => 'GET', 'header' => $auth, 'timeout' => 20, 'ignore_errors' => true],
-            ]));
-            $err = $body === false ? (error_get_last()['message'] ?? 'request failed') : '';
-        }
-        if ($body === false) {
-            log_error('Paystack verify failed: ' . $err);
-            return null;
-        }
-        $json = json_decode($body, true);
-        return ($json['status'] ?? false) ? ($json['data'] ?? null) : null;
+        $subtotal = $cart->getCartTotal($cartKey);
+        $d['discount'] = $pro->discountFor($subtotal, $customerId);   // Packe Pro: 10% off packaging
+        return ['success' => true, 'delivery' => $d, 'amount' => round($subtotal - $d['discount'] + $d['fee'], 2)];
     }
 
     /**
@@ -91,15 +63,8 @@ class OrderController
         if ($existing = $this->model->getOrderIdByReference($reference)) {
             return ['success' => true, 'order_id' => $existing];   // already recorded (e.g. page refreshed)
         }
-        $data = $this->verifyWithPaystack($reference);
-        if (!$data) return Validate::fail('We could not confirm your payment with Paystack. You have not been charged twice; please try again.');
-
-        $expectedPesewas = (int) round($expected['amount'] * 100);
-        if (($data['status'] ?? '') !== 'success') return Validate::fail('Paystack says this payment was not successful.');
-        if ((int) ($data['amount'] ?? 0) !== $expectedPesewas || strtoupper($data['currency'] ?? '') !== 'GHS') {
-            log_error("Amount mismatch for $reference: paid " . ($data['amount'] ?? '?') . ", expected $expectedPesewas");
-            return Validate::fail('The amount paid does not match your order. Please contact us.');
-        }
+        $data = PaystackGateway::verify($reference);
+        if ($problem = PaystackGateway::mismatch($data, $reference, (float) $expected['amount'])) return Validate::fail($problem);
 
         try {
             $orderId = $this->model->createOrderFromCart(

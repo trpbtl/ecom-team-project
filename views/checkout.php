@@ -4,6 +4,7 @@ require_login();
 require_once __DIR__ . '/../controllers/CartController.php';
 require_once __DIR__ . '/../controllers/CustomerController.php';
 require_once __DIR__ . '/../controllers/DeliveryPricing.php';
+require_once __DIR__ . '/../controllers/ProController.php';
 
 $cc = new CartController();
 $items = $cc->getCartItems(get_cart_key());
@@ -12,7 +13,10 @@ if (!$items) {
     redirect('views/cart.php');
 }
 $subtotal = $cc->getCartTotal(get_cart_key());
-$me = (new CustomerController())->getCustomer((int) $_SESSION['customer_id']);
+$pro = new ProController();
+$isPro = $pro->isActive((int) $_SESSION['customer_id']);
+$discount = $pro->discountFor($subtotal, (int) $_SESSION['customer_id']);
+$me =(new CustomerController())->getCustomer((int) $_SESSION['customer_id']);
 $chosen = ($_SESSION['old']['delivery_option'] ?? 'standard') === 'express' ? 'express' : 'standard';
 
 // Free map pieces: Leaflet (map library) + OpenStreetMap (map pictures + address search). See js/delivery-map.js.
@@ -115,8 +119,14 @@ require __DIR__ . '/layout/header.php';
             <?php endforeach; ?>
         </ul>
         <div class="flex justify-between tabular-nums border-t border-line pt-3"><span>Subtotal</span><span id="subtotal" data-value="<?= $subtotal ?>"><?= money($subtotal) ?></span></div>
+        <?php if ($isPro): ?>
+            <div class="flex justify-between tabular-nums text-packe-600 font-semibold"><span>Packe Pro: 10% off</span><span id="pro-discount" data-value="<?= $discount ?>">−<?= money($discount) ?></span></div>
+        <?php endif; ?>
         <div class="flex justify-between gap-3 tabular-nums"><span>Delivery <span id="delivery-km" class="text-muted text-xs"></span></span><span id="delivery-fee" class="text-right text-muted">Choose a spot</span></div>
-        <div class="flex justify-between tabular-nums font-display font-extrabold text-xl"><span>Total</span><span id="grand-total"><?= money($subtotal) ?></span></div>
+        <div class="flex justify-between tabular-nums font-display font-extrabold text-xl"><span>Total</span><span id="grand-total"><?= money($subtotal - $discount) ?></span></div>
+        <?php if (!$isPro): ?>
+            <a href="<?= url('views/pro.php') ?>" class="pro-hint">With <b>Packe Pro</b> this order would be <b><?= money($subtotal * ProController::DISCOUNT_RATE) ?></b> cheaper, with free standard delivery →</a>
+        <?php endif; ?>
         <button class="btn btn-primary mt-2">Continue to payment</button>
         <p class="text-xs text-muted">You'll pay securely in Paystack's window by mobile money or card.</p>
     </aside>

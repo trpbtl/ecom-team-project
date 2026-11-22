@@ -12,6 +12,7 @@ $hasPassword = $cc->hasPassword($id);
 $linked = $cc->getSocialProviders($id);   // e.g. ['google'] when they sign in with Google
 $orders = (new OrderController())->getOrdersByCustomer($id);
 $designs = (new CustomizationController())->getDesignsByCustomer($id);
+$proActive = (new ProController())->getActive($id);   // ProController is loaded by OrderController
 $pageTitle = 'My account';
 require __DIR__ . '/../layout/header.php';
 ?>
@@ -40,6 +41,17 @@ require __DIR__ . '/../layout/header.php';
     </section>
 
     <div class="flex flex-col gap-6 min-w-0">
+        <?php if (!is_admin() && !is_delivery()): ?>
+        <section class="card p-5 flex flex-wrap items-center justify-between gap-3">
+            <?php if ($proActive): ?>
+                <p><span class="pro-chip !ml-0">PRO</span> <b>Packe Pro is active</b> until <?= e(date('j F Y', strtotime($proActive['ends_at']))) ?>: 10% off packaging and free standard delivery.</p>
+                <a href="<?= url('views/pro.php') ?>" class="btn btn-ghost">Manage</a>
+            <?php else: ?>
+                <p><b>Packe Pro:</b> 10% off all packaging and free standard delivery for <?= money(ProController::PRICE) ?> a month.</p>
+                <a href="<?= url('views/pro.php') ?>" class="btn btn-primary">See Packe Pro</a>
+            <?php endif; ?>
+        </section>
+        <?php endif; ?>
         <section class="card p-6">
             <h2 class="font-display font-bold text-xl mb-4">My orders</h2>
             <?php if (!$orders): ?>
