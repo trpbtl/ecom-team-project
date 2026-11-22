@@ -1,160 +1,485 @@
 # Packe: Custom Packaging E-Commerce Platform
 
-A web-based **business-to-business (B2B) e-commerce platform** where businesses in Ghana design, preview, price and order custom packaging online, with delivery handled by Packe's own delivery team.
+A business-to-business (B2B) e-commerce platform where businesses in Ghana design, preview, price, pay for and receive custom packaging online. Built as the team project for CS442 E-Commerce at Ashesi University.
 
-The platform is for SMEs, online retailers, restaurants, cosmetics brands and manufacturers that need custom packaging. Customers serve themselves: they design a box in 3D, see the price straight away, pay with Paystack and choose **standard** or **express** delivery.
-
----
-
-## Features
-
-- **3D designer for every packaging type**: mailer boxes, takeaway food boxes (sealed with a round logo sticker), shipping cartons, stand-up pouches, labels, round stickers, tamper seals, cards, tri-fold brochures and catalogues. Set the size, material, print colour or one of nine standard patterns (images/patterns/), logo and text, with the font (six styles, from clean to script), text size, text colour and italic, and watch it in 3D (boxes, brochures and catalogues fold and unfold). A flat layout view shows cut and fold lines. The templates live in `controllers/DesignTypes.php`.
-- **Instant pricing**: the browser shows an estimate and the server calculates the real price from size, material, print, branding and quantity step, using the same rules.
-- **Shop**: categories, search and product pages. Every product can be bought ready-made, or designed.
-- **Home page showcase**: the 3D window on the home page cycles through a mailer box, food box, pouch, carton, catalogue and sticker, using the same models as the designer (`js/packaging3d.js`).
-- **Add to cart without reloading**: the cart badge updates the moment you click; the item is saved in the background (`js/cart.js`). Adding the same item again raises its quantity.
-- **Cart**: works for guests (a cookie keeps the cart) and carries over after login.
-- **Checkout with delivery priced by distance**: customers drop a pin, search their address or use their location on a free OpenStreetMap map; Packe works out the road distance from Ashesi University and prices standard (GH₵25 + GH₵1.50 per km) and express (1.8 times) delivery. Riders get a "Directions in Google Maps" button.
-- **Paystack payments (test mode)**: mobile money or card in Paystack's popup. Each payment is **verified on the server** with Paystack's API before an order is recorded.
-- **Customer accounts**: register, log in (with email and password, or **Continue with Google**), edit details, change password, delete account, order history and saved designs.
-- **Admin**: dashboard, products (with image upload), categories, orders, order status, and assigning deliveries to riders.
-- **Delivery staff**: a page listing their deliveries, express first, with buttons to mark them picked up and delivered.
+**Live site:** [https://packe.onrender.com](https://packe.onrender.com)
 
 ---
 
-## Tech stack
+## Table of Contents
 
-| Part | Technology |
-|---|---|
-| Views | PHP templates, HTML, Tailwind CSS (CDN), vanilla JavaScript |
-| 3D designer | Three.js (WebGL) |
-| Backend | PHP 8 in an MVC structure |
-| Database | MySQL |
-| Payments | Paystack (test mode) |
-| Hosting | Render (Docker) and Aiven MySQL, both on free plans |
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [System Architecture](#system-architecture)
+4. [Project Structure](#project-structure)
+5. [Technology Stack](#technology-stack)
+6. [Database Schema](#database-schema)
+7. [Installation Guide](#installation-guide)
+8. [Server Deployment](#server-deployment)
+9. [Usage Guide](#usage-guide)
+10. [Endpoints](#endpoints)
+11. [Security](#security)
+12. [Contributors](#contributors)
+13. [License](#license)
 
 ---
 
-## How the code is organised (MVC)
+## Overview
+
+**Packe** lets small and medium businesses (online shops, restaurants, cosmetics brands, manufacturers) order branded packaging without emails, phone calls or manual quotations. A customer designs their packaging in 3D, sees the price immediately, pays with mobile money or card, picks standard or express delivery, and Packe's own riders deliver it.
+
+### Problem Statement
+
+Getting custom packaging in Ghana usually means visiting a printer or exchanging messages to describe sizes and designs, waiting for a quote, and arranging delivery separately. Small businesses can't see what the finished packaging will look like before paying, and prices are rarely clear up front.
+
+### Solution
+
+Packe puts the whole process in one self-service website:
+- Design any packaging type in an interactive 3D designer, with a logo, text, fonts, colours and patterns
+- See the exact price before ordering, calculated from size, material, printing and quantity
+- Pay securely with Paystack (mobile money or card)
+- Drop a pin on a map to get a delivery price based on real road distance
+- Track the order from payment to delivery
+
+---
+
+## Key Features
+
+### For Customers (Businesses)
+
+| Feature | Description |
+|---------|-------------|
+| 3D Packaging Designer | Design mailer boxes, food boxes, cartons, pouches, labels, stickers, seals, cards, brochures and catalogues, and see them fold in 3D |
+| Branding Options | Upload a logo, add text, choose from six fonts, text size, text colour, italic, print colour, a custom colour wheel and nine optional patterns |
+| Instant Pricing | Live price estimate in the browser; the server recalculates the real price before anything is charged |
+| Shop and Search | Browse categories, search products and buy ready-made items or customise them |
+| Cart | Add to cart without reloading the page; works for guests and carries over after login |
+| Map-Based Checkout | Drop a pin, search an address or use your location; delivery is priced by road distance from Packe |
+| Paystack Payment | Mobile money or card in Paystack's popup (test mode) |
+| Accounts | Register with email and password or Continue with Google; edit details, change password, delete account |
+| Order History | Invoices with the delivery location, order status and saved designs |
+| Light and Dark Mode | A header toggle that remembers each visitor's choice |
+
+### For Administrators
+
+| Feature | Description |
+|---------|-------------|
+| Dashboard | Revenue, orders to prepare and orders on the road at a glance |
+| Product Management | Add, edit and delete products with images, materials, keywords and design type |
+| Category Management | Create and rename product categories |
+| Order Management | View every order, change its status and assign a delivery rider |
+| Business Accounts | Add, edit, search and delete accounts, change roles and reset passwords |
+
+### For Delivery Staff
+
+| Feature | Description |
+|---------|-------------|
+| My Deliveries | Assigned deliveries, express orders first |
+| Directions | A "Directions in Google Maps" button to the customer's pin |
+| Status Updates | Mark an order as picked up, then delivered |
+
+### Pricing and Payment Rules
+
+- **Product price:** `unit = (base + area × rate × material) + print or pattern + branding`, then a discount for larger quantity steps
+- **Delivery price:** GH₵25 + GH₵1.50 per km from Ashesi University (standard); express is 1.8 times standard; up to 150 km within Ghana
+- **Server-side checks:** prices and delivery fees are always recalculated in PHP, and every payment is verified with Paystack's API before an order is saved
+
+---
+
+## System Architecture
 
 ```
-core/          db_cred.php (settings), db_class.php (connection), core.php (session, helpers, access control)
-classes/       Models: all SQL lives here (CustomerClass, ProductClass, CustomizationClass, CartClass, OrderClass, DeliveryClass)
-controllers/   Validate input, call the models, return result arrays (no SQL, no HTML)
-actions/       One file per form: read $_POST, call a controller, set a message, redirect
-views/         Pages: HTML with loops and conditions only (no SQL)
-  layout/      header.php, footer.php, sidebar.php
-  partials/    product card, invoice, orders table, design summary
-  account/     my account, edit details, change password, delete account, order
-  admin/       dashboard, products, categories, orders, order detail
-  delivery/    my deliveries (delivery staff)
-js/            validate.js (form checks), cart.js (add to cart without reloading), packaging3d.js (3D models for every type),
-               designer.js (3D designer), hero3d.js (home page showcase)
-css/           style.css
-images/        logo, placeholder, products/ and designs/ (uploads)
-database/      packe.sql (tables and starter products)
+┌─────────────────────────────────────────────────────────────┐
+│                      CLIENT BROWSER                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  HTML/CSS   │  │ JavaScript  │  │ Three.js (3D)       │  │
+│  │  Tailwind   │  │  (vanilla)  │  │ Leaflet (map)       │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                PHP BACKEND (MVC, Apache)                    │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────┐ ┌────────────┐  │
+│  │  Views   │ │ Actions  │ │ Controllers  │ │  Classes   │  │
+│  │ (pages)  │ │ (forms)  │ │ (rules)      │ │  (SQL)     │  │
+│  └──────────┘ └──────────┘ └──────────────┘ └────────────┘  │
+│          core/: session, security, database connection      │
+└─────────────────────────────────────────────────────────────┘
+          │                                   │
+          ▼                                   ▼
+┌───────────────────────────┐   ┌─────────────────────────────┐
+│      MySQL DATABASE       │   │      EXTERNAL SERVICES      │
+│  Customers · Products     │   │  Paystack (payments)        │
+│  Customizations · Cart    │   │  Google (sign-in)           │
+│  Orders · Payments        │   │  OpenStreetMap / Nominatim  │
+│  Deliveries               │   │  OSRM / OpenRouteService    │
+└───────────────────────────┘   └─────────────────────────────┘
 ```
 
-The rules followed throughout:
-- Every query uses **prepared statements**.
-- Passwords use **`password_hash()` / `password_verify()`**.
-- Every form is checked **in JavaScript and again in PHP**.
-- Every POST form carries a **CSRF token**.
-- Uploads are checked for **real file type and size** on the server.
-- Admin pages call **`require_admin()`** before any output.
-
-### Team and responsibilities
-
-| Member | Areas |
-|---|---|
-| **Hagen Dickson** | Accounts and login, product catalogue, categories |
-| **Josephine Allan** | 3D designer, customization and pricing |
-| **Donna Omaboe** | Cart, checkout, Paystack payment |
-| **Eyram Awoye** | Orders, delivery, admin dashboard |
+A request moves through the layers in one direction: a **view** shows a form, an **action** receives it and checks the CSRF token, a **controller** validates the input and applies the business rules, and a **class** reads or writes the database. The result travels back up as a redirect with a message, or as JSON when the page sent the request in the background.
 
 ---
 
-## Run it locally (XAMPP)
+## Project Structure
 
-1. Install [XAMPP](https://www.apachefriends.org/) and start **Apache** and **MySQL**.
-2. Clone this repository into `C:\xampp\htdocs\`:
+```
+ecom-team-project/
+├── actions/                      # One file per form or request (26)
+│   ├── add_to_cart_action.php    # Add an item (JSON or redirect)
+│   ├── save_design_action.php    # Save a 3D design and add it to the cart
+│   ├── checkout_action.php       # Validate delivery details, price delivery
+│   ├── delivery_quote.php        # Live delivery price for a map pin (JSON)
+│   ├── process_payment_action.php # Verify Paystack payment, create the order
+│   ├── google_login.php          # Start Google sign-in
+│   ├── google_callback.php       # Finish Google sign-in
+│   └── ...                       # Accounts, products, categories, orders, businesses
+│
+├── classes/                      # Models: all SQL lives here
+│   ├── CustomerClass.php
+│   ├── ProductClass.php
+│   ├── CustomizationClass.php
+│   ├── CartClass.php
+│   ├── OrderClass.php
+│   ├── DeliveryClass.php
+│   └── BusinessClass.php
+│
+├── controllers/                  # Business rules: validation, pricing, payments
+│   ├── Validate.php              # Shared form rules
+│   ├── DesignTypes.php           # Packaging templates, fonts, patterns, pricing
+│   ├── DeliveryPricing.php       # Road distance and delivery fees
+│   ├── GoogleAuthController.php  # Google OAuth sign-in
+│   ├── OrderController.php       # Checkout and Paystack verification
+│   └── ...                       # Cart, Customer, Customization, Product, Delivery, Business
+│
+├── core/
+│   ├── core.php                  # Session, helpers, CSRF, roles, uploads
+│   ├── db_class.php              # Shared database connection, prepared statements
+│   ├── db_cred.php               # Settings read from the environment
+│   └── local_cred.example.php    # Template for local keys (real file is git-ignored)
+│
+├── views/                        # Pages (no SQL)
+│   ├── home.php · all_products.php · single_product.php · search_results.php
+│   ├── customize.php             # 3D designer
+│   ├── cart.php · checkout.php · payment.php · payment_success.php
+│   ├── login.php · register.php · complete_signup.php · privacy.php
+│   ├── account/                  # My account, edit, change password, delete, order
+│   ├── admin/                    # Dashboard, products, categories, orders, businesses
+│   ├── delivery/                 # My deliveries
+│   ├── layout/                   # Header, footer, sidebar
+│   └── partials/                 # Product card, invoice, orders table, design summary
+│
+├── js/
+│   ├── packaging3d.js            # 3D models for every packaging type
+│   ├── designer.js               # 3D designer and live price
+│   ├── hero3d.js                 # Home page 3D showcase
+│   ├── cart.js                   # Add to cart without reloading
+│   ├── delivery-map.js           # Checkout map, search and delivery quote
+│   ├── validate.js               # Form checks in the browser
+│   └── theme.js                  # Light and dark mode toggle
+│
+├── css/style.css                 # Shared components and themes
+├── images/                       # Logo, catalogue illustrations, patterns, uploads
+├── database/packe.sql            # Tables and starter products
+├── setup.php                     # Creates or safely upgrades the database
+├── Dockerfile · render.yaml      # Hosting on Render
+└── README.md
+```
+
+---
+
+## Technology Stack
+
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| HTML5 | Page structure |
+| Tailwind CSS 3.4 (CDN) | Utility-first styling |
+| JavaScript (ES6+) | Interactivity, live prices, background requests |
+| Three.js 0.160 | 3D packaging designer and home page showcase |
+| Leaflet 1.9 + OpenStreetMap | Checkout delivery map |
+
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| PHP 8.3 | Server-side logic in an MVC structure (no framework) |
+| MySQL 8 | Database |
+| Apache | Web server |
+
+### External Services and APIs
+| Service | Purpose |
+|---------|---------|
+| Paystack | Mobile money and card payments, verified with the Verify API |
+| Google OAuth 2.0 / OpenID Connect | "Continue with Google" sign-in |
+| Nominatim (OpenStreetMap) | Address search at checkout |
+| OSRM and OpenRouteService | Road distance for delivery pricing |
+| Google Maps links | Free directions for riders |
+
+### Hosting and Tools
+| Tool | Purpose |
+|------|---------|
+| Render (Docker) | Hosts the live website |
+| Aiven | Hosts the MySQL database |
+| XAMPP | Local development server |
+| Git and GitHub | Version control |
+
+---
+
+## Database Schema
+
+### Entity Relationship Diagram
+
+```
+┌────────────────┐        ┌─────────────────┐       ┌────────────────┐
+│   customers    │        │    products     │       │   categories   │
+├────────────────┤        ├─────────────────┤       ├────────────────┤
+│ customer_id PK │        │ product_id PK   │──────▶│ category_id PK │
+│ full_name      │        │ category_id FK  │       │ category_name  │
+│ email          │        │ name            │       └────────────────┘
+│ password_hash  │        │ material        │
+│ phone          │        │ base_price      │
+│ business_name  │        │ design_type     │
+│ city, address  │        └────────┬────────┘
+│ user_role      │                 │
+└───────┬────────┘                 │
+        │      ┌───────────────────┴──────────────┐
+        │      ▼                                  ▼
+        │  ┌──────────────────┐          ┌──────────────────┐
+        ├─▶│ customizations   │          │      cart        │
+        │  ├──────────────────┤          ├──────────────────┤
+        │  │ customization_id │◀─────────│ customization_id │
+        │  │ size, material   │          │ cart_key         │
+        │  │ logo, text, font │          │ product_id FK    │
+        │  │ pattern          │          │ quantity         │
+        │  │ unit_price       │          └──────────────────┘
+        │  └──────────────────┘
+        ▼
+┌────────────────┐     ┌──────────────────┐     ┌────────────────────┐
+│     orders     │────▶│   order_items    │     │    deliveries      │
+├────────────────┤     ├──────────────────┤     ├────────────────────┤
+│ order_id PK    │     │ order_id FK      │     │ order_id FK        │
+│ customer_id FK │     │ product_id FK    │     │ recipient, address │
+│ invoice_no     │     │ quantity         │     │ latitude/longitude │
+│ subtotal       │     │ unit_price       │     │ distance_km        │
+│ delivery_fee   │     └──────────────────┘     │ delivery_option    │
+│ total_amount   │────────────────────────────▶ │ assigned_to FK     │
+│ order_status   │     ┌──────────────────┐     │ status             │
+└───────┬────────┘     │    payments      │     └────────────────────┘
+        └─────────────▶├──────────────────┤
+                       │ order_id FK      │     ┌────────────────────┐
+                       │ amount, currency │     │   social_logins    │
+                       │ channel          │     ├────────────────────┤
+                       │ reference        │     │ customer_id FK     │
+                       └──────────────────┘     │ provider (google)  │
+                                                └────────────────────┘
+```
+
+### Table Descriptions
+
+| Table | Description |
+|-------|-------------|
+| **customers** | Accounts for businesses, admins (role 1), customers (role 2) and delivery staff (role 3) |
+| **social_logins** | Google accounts linked to Packe accounts |
+| **categories** | Product groups such as Boxes, Labels and Food Packaging |
+| **products** | Packaging products with base price, material and 3D template type |
+| **customizations** | Each saved design: size, material, colours, logo, text, font, pattern, price |
+| **cart** | Items in a cart, linked to a cookie key so guests can shop |
+| **orders** | Paid orders with invoice number, totals and status |
+| **order_items** | The products and designs in each order |
+| **payments** | Paystack payment records: amount, channel and reference |
+| **deliveries** | Recipient, map pin, distance, delivery option, rider and status |
+
+---
+
+## Installation Guide
+
+### Prerequisites
+
+- XAMPP (Apache, PHP 8, MySQL)
+- Git
+- A web browser (Chrome, Edge, Firefox or Safari)
+- Optional: a free Paystack account (test mode) and Google Cloud OAuth keys
+
+### Local Development Setup
+
+1. **Clone the repository** into XAMPP's `htdocs` folder
    ```bash
+   cd C:\xampp\htdocs
    git clone https://github.com/trpbtl/ecom-team-project.git
    ```
-3. Open phpMyAdmin (`http://localhost/phpmyadmin`) and import `database/packe.sql`. This creates the `packe` database with starter products.
-4. Optional: copy `core/local_cred.example.php` to `core/local_cred.php` and add your Paystack **test** keys. The database defaults (root, no password) already match XAMPP.
-5. Open `http://localhost/ecom-team-project/`.
 
-**Make an admin:** register an account on the site, then run this in phpMyAdmin:
-```sql
-UPDATE customers SET user_role = 1 WHERE email = 'you@example.com';   -- 1 = admin
-UPDATE customers SET user_role = 3 WHERE email = 'rider@example.com'; -- 3 = delivery staff
-```
-Log out and in again for the new role to apply.
+2. **Start XAMPP**: open the XAMPP Control Panel and start **Apache** and **MySQL**.
 
----
+3. **Create the database**: open `http://localhost/phpmyadmin` and import `database/packe.sql`. This creates the `packe` database with starter products.
 
-## Paystack test mode
+4. **Add your keys (optional)**: copy `core/local_cred.example.php` to `core/local_cred.php` and add your Paystack **test** keys and Google keys. The database defaults (user `root`, no password) already match XAMPP.
 
-1. Create a free Paystack account with **Ghana** as the country.
-2. In **Settings → API Keys & Webhooks**, stay in **Test mode** and copy the `pk_test_…` and `sk_test_…` keys.
-3. Put them in `core/local_cred.php` (locally) or in Render's environment variables (online).
-4. At payment, use Paystack's test card or test mobile money from [Paystack's test payments page](https://paystack.com/docs/payments/test-payments). In test mode, Paystack pre-fills a test MTN number; click **Confirm**. No real money moves.
+5. **Open the site**
+   ```
+   http://localhost/ecom-team-project/
+   ```
 
-The server calls Paystack with PHP's `curl` extension when it's available, and otherwise with PHP's built-in HTTPS support. Some XAMPP setups start Apache without curl; payments still work either way.
-
-How a payment is checked (`actions/process_payment_action.php` → `OrderController::completePayment`):
-1. Our server creates the payment reference at checkout and remembers the exact amount.
-2. After the popup, the server calls Paystack's **Verify API** with the secret key.
-3. The order is saved only if the status is `success`, the reference matches, the currency is GHS, and the amount matches to the pesewa.
-4. The order, its items, the payment and the delivery are saved in **one database transaction**, and the cart is emptied.
+6. **Make an admin or rider**: register an account, then run in phpMyAdmin:
+   ```sql
+   UPDATE customers SET user_role = 1 WHERE email = 'you@example.com';   -- 1 = admin
+   UPDATE customers SET user_role = 3 WHERE email = 'rider@example.com'; -- 3 = delivery staff
+   ```
+   After that, admins can change roles from **Admin → Businesses**.
 
 ---
 
-## Sign in with Google (optional)
+## Server Deployment
 
-The "Continue with Google" button appears only once both Google keys are set.
+The live site runs on **Render** (a Docker container with PHP 8.3 and Apache) with the database on **Aiven** MySQL, both on free plans.
 
-1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, then open **APIs & Services → OAuth consent screen**. Choose **External**, fill in the app name (Packe) and your email, and add the scopes `openid`, `email` and `profile`. While the app is in **Testing**, add each Google account that may sign in under **Test users**.
-2. Open **APIs & Services → Credentials → Create credentials → OAuth client ID**, type **Web application**.
-3. Under **Authorized redirect URIs**, add the address Google sends people back to:
-   - Locally: `http://localhost/packe/actions/google_callback.php`
-   - Online: `https://packe.onrender.com/actions/google_callback.php`
-4. Copy the **Client ID** and **Client secret** into `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: in `core/local_cred.php` locally (as `LOCAL_GOOGLE_...`), or in Render's environment variables online.
-5. Open `/setup.php` once so the database has the `social_logins` table.
-
-How it works (`controllers/GoogleAuthController.php`): the customer is sent to Google with a random `state` and `nonce` saved in the session. Google returns a one-time code to `actions/google_callback.php`; the server swaps it for an ID token and checks it is for this app, from Google, not expired and has the same nonce. A known Google account logs straight in; a verified email that matches a Packe account is linked to it; anyone new fills in their phone number and city once on `views/complete_signup.php`. Accounts made with Google have no password until they set one on the change-password page.
-
----
-
-## Put it online for free (Render + Aiven)
-
-1. **Database:** create a free **MySQL** service on [Aiven](https://aiven.io/free-tier). From its overview page, note the host, port, user and password, and download the **CA certificate** (`ca.pem`).
-2. **Import the data** from a computer with XAMPP (it creates the `packe` database):
+1. **Database:** create a free MySQL service on Aiven and note the host, port, user and password. Download the CA certificate.
+2. **Import the data:**
    ```bash
    C:\xampp\mysql\bin\mysql.exe -h YOUR-AIVEN-HOST -P YOUR-PORT -u avnadmin -p --ssl < database\packe.sql
    ```
-   Type the Aiven password when asked.
-3. **Web app:** on [Render](https://render.com), choose **New → Blueprint**, select this repository, and Render reads `render.yaml`. It builds from the `Dockerfile`.
-4. In Render, fill in the environment variables:
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`: from Aiven
-   - `DB_NAME`: `packe`
-   - `DB_SSL`: `true`
-   - `DB_SSL_CA`: open `ca.pem` in Notepad and paste its whole text
-   - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`: your **test** keys
-   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: optional, for "Continue with Google" (see above)
-   - `SUPPORT_EMAIL`: optional, the contact email shown on the privacy policy page
-   - `ORS_API_KEY`: optional, a free OpenRouteService key (openrouteservice.org, no card) for road distances. Without it Packe uses the free OSRM demo server, then a straight-line estimate
-5. Open the `onrender.com` address Render gives you.
-6. **After each deploy that changes the database**, open `/setup.php` on the site once. On a database that is already set up, it only adds what's missing (for example the `design_type` column) and never deletes data.
+3. **Web app:** on Render choose **New → Blueprint** and select this repository. Render reads `render.yaml` and builds from the `Dockerfile`.
+4. **Environment variables** (entered in Render, never committed):
 
-Notes on the free plans:
-- Render's free service **sleeps after 15 minutes** without visits, and the first visit after that takes about a minute. Open the site a minute before a demo.
-- Files uploaded on Render (product images and logos) are **lost when the service restarts or redeploys**, because its disk is temporary. That's fine for a demo; a real launch would store uploads in cloud storage.
+   | Variable | Value |
+   |----------|-------|
+   | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` | From Aiven |
+   | `DB_NAME`, `DB_SSL`, `DB_SSL_CA` | `packe`, `true`, the text of `ca.pem` |
+   | `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY` | Paystack test keys |
+   | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional, for Google sign-in |
+   | `ORS_API_KEY` | Optional, OpenRouteService key for road distances |
+   | `SUPPORT_EMAIL` | Optional, shown on the privacy page |
+
+5. **After each deploy that changes the database**, open `/setup.php` once. It only adds missing tables and columns and never deletes data.
+
+**Free plan notes:** Render's free service sleeps after 15 minutes without visits, so the first visit afterwards takes about a minute. Uploaded images are lost when the service redeploys, because its disk is temporary.
 
 ---
 
-## Documentation
+## Usage Guide
 
-- [System Development Lifecycle: Design and Architecture](docs/System-Development-Lifecycle-Design-and-Architecture.docx)
-- Optional CMS version: https://josephineallan369.wixsite.com/packe-1
+### For Customers
+
+1. **Sign up or log in** with email and password, or with **Continue with Google**.
+2. **Design packaging:** open **Design packaging**, pick a packaging type, set the size and material, add a logo, text, colours or a pattern, and turn the 3D model to check it.
+3. **Add to cart:** choose a quantity. The price updates as you change the design.
+4. **Check out:**
+   - Drop a pin on the map, search your address, or use your location
+   - Fill in the recipient's name and phone number
+   - Choose standard or express delivery
+5. **Pay** with mobile money or card in the Paystack popup. In test mode, use Paystack's test details; no real money moves.
+6. **Track** the order and view its invoice from **My account**.
+
+### For Administrators
+
+1. Open **Dashboard** for a summary of revenue and orders.
+2. Manage **Products** and **Categories**.
+3. In **Orders**, update each order's status and assign a delivery rider.
+4. In **Businesses**, add or edit accounts, change roles or reset passwords.
+
+### For Delivery Staff
+
+1. Open **My deliveries** to see assigned orders, express first.
+2. Tap **Directions in Google Maps** to navigate to the customer's pin.
+3. Mark each order **Picked up** and then **Delivered**.
+
+---
+
+## Endpoints
+
+Every `POST` endpoint requires a valid CSRF token. Most redirect back with a message; those marked **JSON** answer background requests from the page.
+
+### Cart and Checkout
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `actions/add_to_cart_action.php` | POST | Add a product to the cart (JSON or redirect) |
+| `actions/update_qty_action.php` | POST | Change an item's quantity |
+| `actions/remove_from_cart_action.php` | POST | Remove an item |
+| `actions/save_design_action.php` | POST | Save a design, price it on the server, add it to the cart |
+| `actions/delivery_quote.php?lat=…&lng=…` | GET | Delivery price for a map pin, logged-in users only (JSON) |
+| `actions/checkout_action.php` | POST | Validate delivery details and prepare payment |
+| `actions/process_payment_action.php` | GET | Verify the Paystack payment and create the order |
+
+### Accounts
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `actions/register_action.php` | POST | Create an account |
+| `actions/login_action.php` | POST | Log in with email and password |
+| `actions/google_login.php` | GET | Start Google sign-in |
+| `actions/google_callback.php` | GET | Finish Google sign-in |
+| `actions/complete_signup_action.php` | POST | First-time Google users add their details |
+| `actions/edit_account_action.php` | POST | Update account details |
+| `actions/change_pass_action.php` | POST | Change or set a password |
+| `actions/delete_account_action.php` | POST | Delete an account |
+
+### Administration and Delivery
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `actions/add_product_action.php` / `update_product_action.php` | POST | Add or edit a product |
+| `actions/add_category_action.php` / `update_category_action.php` | POST | Add or rename a category |
+| `actions/update_order_status_action.php` | POST | Change an order's status |
+| `actions/assign_delivery_action.php` | POST | Assign a rider to an order |
+| `actions/add_business_action.php` / `update_business_action.php` | POST | Add or edit an account |
+| `actions/update_business_role_action.php` | POST | Change an account's role |
+| `actions/delete_business_action.php` | POST | Delete an account with no orders |
+| `actions/update_delivery_status_action.php` | POST | Rider marks picked up or delivered |
+
+---
+
+## Security
+
+| Risk | Protection | Where |
+|------|------------|-------|
+| SQL injection | Every query is a prepared statement with bound values | `core/db_class.php` |
+| Stolen passwords | Only bcrypt hashes are stored (`password_hash` / `password_verify`) | `classes/CustomerClass.php` |
+| Forged forms (CSRF) | A random token per session, checked with `hash_equals` | `require_post()` in `core/core.php` |
+| Session hijacking | New session ID at login; HttpOnly, SameSite and Secure cookies | `core/core.php` |
+| Script injection (XSS) | All output is escaped with `e()` (`htmlspecialchars`) | Every view |
+| Wrong role | `require_login()`, `require_admin()`, `require_delivery()`; the role is re-read from the database on every page | `core/core.php` |
+| Payment tampering | Amount, currency and reference are verified with Paystack's API on the server | `controllers/OrderController.php` |
+| Harmful uploads | Real file type checked with `finfo`, size limits, random file names | `save_uploaded_image()` |
+| Leaked keys | Keys live in environment variables or the git-ignored `core/local_cred.php` | `core/db_cred.php` |
+
+---
+
+## Contributors
+
+| Name | Role |
+|------|------|
+| Hagen Dickson | User management and authentication, product catalogue, admin business accounts |
+| Josephine Allan | 3D packaging designer, customisation and pricing, CMS version |
+| Donna Omaboe | Shopping cart, checkout and Paystack payment |
+| Eyram-Makafui Awoye | Order management, delivery management and pricing, administration, Google sign-in |
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Acknowledgments
+
+- Ashesi University, CS442 E-Commerce
+- [Three.js](https://threejs.org/) for 3D rendering
+- [Leaflet](https://leafletjs.com/) and [OpenStreetMap](https://www.openstreetmap.org/) contributors for maps
+- [Paystack](https://paystack.com/) for payments
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+
+---
+
+## Repository
+
+GitHub: [https://github.com/trpbtl/ecom-team-project](https://github.com/trpbtl/ecom-team-project)
+
+Design document: [System Development Lifecycle: Design and Architecture](docs/System-Development-Lifecycle-Design-and-Architecture.docx)
+
+Optional CMS version: [https://josephineallan369.wixsite.com/packe-1](https://josephineallan369.wixsite.com/packe-1)
+
+---
+
+*Packe: Custom Packaging E-Commerce Platform. CS442 E-Commerce*
+*Ashesi University, 2026*
