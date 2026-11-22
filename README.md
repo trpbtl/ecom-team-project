@@ -26,7 +26,7 @@ A business-to-business (B2B) e-commerce platform where businesses in Ghana desig
 
 ## Overview
 
-**Packe** lets small and medium businesses (online shops, restaurants, cosmetics brands, manufacturers) order branded packaging without emails, phone calls or manual quotations. A customer designs their packaging in 3D, sees the price immediately, pays with mobile money or card, picks standard or express delivery, and Packe's own riders deliver it.
+**Packe** lets small and medium businesses (online shops, restaurants, cosmetics brands, manufacturers) order branded packaging without emails, phone calls or manual quotations. A customer designs their packaging in 3D, sees the price immediately, pays with mobile money or card, picks standard or express delivery, and chooses who delivers it: Packe's own riders, or an Uber, Yango or Bolt driver that Packe books for them. Regular customers can join **Packe Pro**, a monthly membership with 10% off and free delivery.
 
 ### Problem Statement
 
@@ -39,6 +39,8 @@ Packe puts the whole process in one self-service website:
 - See the exact price before ordering, calculated from size, material, printing and quantity
 - Pay securely with Paystack (mobile money or card)
 - Drop a pin on a map to get a delivery price based on real road distance
+- Choose Packe Delivery, Uber, Yango or Bolt, and see the driver's details on the order
+- Save with Packe Pro when ordering every month
 - Track the order from payment to delivery
 
 ---
@@ -55,9 +57,11 @@ Packe puts the whole process in one self-service website:
 | Shop and Search | Browse categories, search products and buy ready-made items or customise them |
 | Cart | Add to cart without reloading the page; works for guests and carries over after login |
 | Map-Based Checkout | Drop a pin, search an address or use your location; delivery is priced by road distance from Packe |
+| Delivery Partners | Choose Packe Delivery or let Packe book an Uber, Yango or Bolt driver (GH₵5 booking fee); the driver's name, phone and tracking link appear on the order |
 | Paystack Payment | Mobile money or card in Paystack's popup (test mode) |
+| Packe Pro | GH₵99 a month for 10% off all packaging and free standard delivery with Packe riders |
 | Accounts | Register with email and password or Continue with Google; edit details, change password, delete account |
-| Order History | Invoices with the delivery location, order status and saved designs |
+| Order History | Invoices with the delivery location, courier, driver, order status and saved designs |
 | Light and Dark Mode | A header toggle that remembers each visitor's choice |
 
 ### For Administrators
@@ -68,7 +72,9 @@ Packe puts the whole process in one self-service website:
 | Product Management | Add, edit and delete products with images, materials, keywords and design type |
 | Category Management | Create and rename product categories |
 | Order Management | View every order, change its status and assign a delivery rider |
+| Partner Bookings | For Uber, Yango and Bolt orders: open the partner's app, then save the driver's name, phone and trip link for the customer |
 | Business Accounts | Add, edit, search and delete accounts, change roles and reset passwords |
+| Analytics | Income by revenue stream, sales per day, orders by status, top products and categories, the design-to-order funnel, delivery and courier split, riders, payment methods and top cities, drawn from 10 tables |
 
 ### For Delivery Staff
 
@@ -78,11 +84,28 @@ Packe puts the whole process in one self-service website:
 | Directions | A "Directions in Google Maps" button to the customer's pin |
 | Status Updates | Mark an order as picked up, then delivered |
 
+### Revenue Model
+
+Packe earns in eight ways, all built into the application:
+
+| Revenue stream | How it works | Where in the code |
+|----------------|--------------|-------------------|
+| Packaging sales | Price per unit from size, material and quantity | `controllers/DesignTypes.php` |
+| Volume tiers | Lower unit price at each bigger quantity step | `DesignTypes::FACTORS` |
+| Branding fee | Extra charge for printing a logo or text | `DesignTypes::unitPrice()` |
+| Pattern premium | Full-colour patterns cost 1.5 times the print fee | `DesignTypes::PATTERN_FACTOR` |
+| Delivery fees | GH₵25 + GH₵1.50 per km by road | `controllers/DeliveryPricing.php` |
+| Express rush | Express delivery costs 1.8 times standard | `DELIVERY_EXPRESS_FACTOR` |
+| Partner booking fee | GH₵5 on Uber, Yango and Bolt deliveries | `controllers/Couriers.php` |
+| Packe Pro | GH₵99 a month membership (recurring income) | `controllers/ProController.php` |
+
 ### Pricing and Payment Rules
 
 - **Product price:** `unit = (base + area × rate × material) + print or pattern + branding`, then a discount for larger quantity steps
 - **Delivery price:** GH₵25 + GH₵1.50 per km from Ashesi University (standard); express is 1.8 times standard; up to 150 km within Ghana
-- **Server-side checks:** prices and delivery fees are always recalculated in PHP, and every payment is verified with Paystack's API before an order is saved
+- **Delivery partners:** Uber, Yango and Bolt cost the same as Packe delivery plus a GH₵5 booking fee
+- **Packe Pro:** members get 10% off the packaging subtotal and free standard delivery with Packe riders. It pays for itself with 4 deliveries a month (each at least GH₵25), or about GH₵990 of packaging
+- **Server-side checks:** prices, delivery fees and the Pro discount are always recalculated in PHP, and every payment (orders and Pro) is verified with Paystack's API before anything is saved
 
 ---
 
@@ -125,12 +148,14 @@ A request moves through the layers in one direction: a **view** shows a form, an
 
 ```
 ecom-team-project/
-├── actions/                      # One file per form or request (26)
+├── actions/                      # One file per form or request (28)
 │   ├── add_to_cart_action.php    # Add an item (JSON or redirect)
 │   ├── save_design_action.php    # Save a 3D design and add it to the cart
-│   ├── checkout_action.php       # Validate delivery details, price delivery
+│   ├── checkout_action.php       # Validate delivery, courier and Pro discount
 │   ├── delivery_quote.php        # Live delivery price for a map pin (JSON)
 │   ├── process_payment_action.php # Verify Paystack payment, create the order
+│   ├── process_pro_payment_action.php # Verify a Packe Pro payment, add 30 days
+│   ├── book_partner_action.php   # Admin saves the Uber/Yango/Bolt driver
 │   ├── google_login.php          # Start Google sign-in
 │   ├── google_callback.php       # Finish Google sign-in
 │   └── ...                       # Accounts, products, categories, orders, businesses
@@ -142,14 +167,20 @@ ecom-team-project/
 │   ├── CartClass.php
 │   ├── OrderClass.php
 │   ├── DeliveryClass.php
-│   └── BusinessClass.php
+│   ├── BusinessClass.php
+│   ├── SubscriptionClass.php     # Packe Pro memberships
+│   └── AnalyticsClass.php        # Read-only figures for Analytics
 │
 ├── controllers/                  # Business rules: validation, pricing, payments
 │   ├── Validate.php              # Shared form rules
 │   ├── DesignTypes.php           # Packaging templates, fonts, patterns, pricing
 │   ├── DeliveryPricing.php       # Road distance and delivery fees
+│   ├── Couriers.php              # Packe Delivery, Uber, Yango, Bolt and the booking fee
+│   ├── ProController.php         # Packe Pro: discount, free delivery, payments
+│   ├── PaystackGateway.php       # Shared Paystack verification
+│   ├── AnalyticsController.php   # Revenue streams and dashboard figures
 │   ├── GoogleAuthController.php  # Google OAuth sign-in
-│   ├── OrderController.php       # Checkout and Paystack verification
+│   ├── OrderController.php       # Checkout and order payments
 │   └── ...                       # Cart, Customer, Customization, Product, Delivery, Business
 │
 ├── core/
@@ -162,9 +193,10 @@ ecom-team-project/
 │   ├── home.php · all_products.php · single_product.php · search_results.php
 │   ├── customize.php             # 3D designer
 │   ├── cart.php · checkout.php · payment.php · payment_success.php
+│   ├── pro.php                   # Packe Pro membership
 │   ├── login.php · register.php · complete_signup.php · privacy.php
 │   ├── account/                  # My account, edit, change password, delete, order
-│   ├── admin/                    # Dashboard, products, categories, orders, businesses
+│   ├── admin/                    # Dashboard, analytics, products, categories, orders, businesses
 │   ├── delivery/                 # My deliveries
 │   ├── layout/                   # Header, footer, sidebar
 │   └── partials/                 # Product card, invoice, orders table, design summary
@@ -176,10 +208,11 @@ ecom-team-project/
 │   ├── cart.js                   # Add to cart without reloading
 │   ├── delivery-map.js           # Checkout map, search and delivery quote
 │   ├── validate.js               # Form checks in the browser
+│   ├── analytics.js              # Admin charts (Chart.js)
 │   └── theme.js                  # Light and dark mode toggle
 │
 ├── css/style.css                 # Shared components and themes
-├── images/                       # Logo, catalogue illustrations, patterns, uploads
+├── images/                       # Logo, catalogue illustrations, patterns, courier logos, uploads
 ├── database/packe.sql            # Tables and starter products
 ├── setup.php                     # Creates or safely upgrades the database
 ├── Dockerfile · render.yaml      # Hosting on Render
@@ -198,6 +231,7 @@ ecom-team-project/
 | JavaScript (ES6+) | Interactivity, live prices, background requests |
 | Three.js 0.160 | 3D packaging designer and home page showcase |
 | Leaflet 1.9 + OpenStreetMap | Checkout delivery map |
+| Chart.js 4.4 | Admin analytics charts |
 
 ### Backend
 | Technology | Purpose |
@@ -214,6 +248,7 @@ ecom-team-project/
 | Nominatim (OpenStreetMap) | Address search at checkout |
 | OSRM and OpenRouteService | Road distance for delivery pricing |
 | Google Maps links | Free directions for riders |
+| Uber, Yango Delivery, Bolt | Partner couriers that Packe books through their own apps |
 
 ### Hosting and Tools
 | Tool | Purpose |
@@ -261,17 +296,25 @@ ecom-team-project/
 │ customer_id FK │     │ product_id FK    │     │ recipient, address │
 │ invoice_no     │     │ quantity         │     │ latitude/longitude │
 │ subtotal       │     │ unit_price       │     │ distance_km        │
-│ delivery_fee   │     └──────────────────┘     │ delivery_option    │
+│ discount (Pro) │     └──────────────────┘     │ delivery_option    │
+│ delivery_fee   │                              │ carrier            │
 │ total_amount   │────────────────────────────▶ │ assigned_to FK     │
-│ order_status   │     ┌──────────────────┐     │ status             │
-└───────┬────────┘     │    payments      │     └────────────────────┘
-        └─────────────▶├──────────────────┤
-                       │ order_id FK      │     ┌────────────────────┐
-                       │ amount, currency │     │   social_logins    │
-                       │ channel          │     ├────────────────────┤
-                       │ reference        │     │ customer_id FK     │
-                       └──────────────────┘     │ provider (google)  │
-                                                └────────────────────┘
+│ order_status   │     ┌──────────────────┐     │ driver name, phone │
+└───────┬────────┘     │    payments      │     │ tracking_url       │
+        └─────────────▶├──────────────────┤     │ status             │
+                       │ order_id FK      │     └────────────────────┘
+                       │ amount, currency │
+                       │ channel          │     ┌────────────────────┐
+                       │ reference        │     │   social_logins    │
+                       └──────────────────┘     ├────────────────────┤
+                                                │ customer_id FK     │
+┌────────────────────┐                          │ provider (google)  │
+│   subscriptions    │                          └────────────────────┘
+├────────────────────┤
+│ customer_id FK     │  Packe Pro: one row per paid month
+│ amount, reference  │
+│ starts_at, ends_at │
+└────────────────────┘
 ```
 
 ### Table Descriptions
@@ -284,10 +327,11 @@ ecom-team-project/
 | **products** | Packaging products with base price, material and 3D template type |
 | **customizations** | Each saved design: size, material, colours, logo, text, font, pattern, price |
 | **cart** | Items in a cart, linked to a cookie key so guests can shop |
-| **orders** | Paid orders with invoice number, totals and status |
+| **orders** | Paid orders with invoice number, totals, Pro discount and status |
 | **order_items** | The products and designs in each order |
 | **payments** | Paystack payment records: amount, channel and reference |
-| **deliveries** | Recipient, map pin, distance, delivery option, rider and status |
+| **deliveries** | Recipient, map pin, distance, speed, courier (Packe, Uber, Yango, Bolt), rider or partner driver, tracking link and status |
+| **subscriptions** | Packe Pro payments: who paid, how much, and the 30 days each payment covers |
 
 ---
 
@@ -366,14 +410,16 @@ The live site runs on **Render** (a Docker container with PHP 8.3 and Apache) wi
    - Drop a pin on the map, search your address, or use your location
    - Fill in the recipient's name and phone number
    - Choose standard or express delivery
+   - Choose who delivers: **Packe Delivery**, **Uber**, **Yango** or **Bolt**
 5. **Pay** with mobile money or card in the Paystack popup. In test mode, use Paystack's test details; no real money moves.
-6. **Track** the order and view its invoice from **My account**.
+6. **Track** the order and view its invoice from **My account**. For partner deliveries, the driver's name, phone and tracking link appear there once Packe books the ride.
+7. **Join Packe Pro** from the menu to get 10% off and free standard delivery on every order for 30 days.
 
 ### For Administrators
 
-1. Open **Dashboard** for a summary of revenue and orders.
+1. Open **Dashboard** for a summary of revenue and orders, and **Analytics** for charts across all the data.
 2. Manage **Products** and **Categories**.
-3. In **Orders**, update each order's status and assign a delivery rider.
+3. In **Orders**, update each order's status and assign a delivery rider. For Uber, Yango or Bolt orders, open the partner's app, book the ride, then save the driver's name, phone and trip link.
 4. In **Businesses**, add or edit accounts, change roles or reset passwords.
 
 ### For Delivery Staff
@@ -397,8 +443,9 @@ Every `POST` endpoint requires a valid CSRF token. Most redirect back with a mes
 | `actions/remove_from_cart_action.php` | POST | Remove an item |
 | `actions/save_design_action.php` | POST | Save a design, price it on the server, add it to the cart |
 | `actions/delivery_quote.php?lat=…&lng=…` | GET | Delivery price for a map pin, logged-in users only (JSON) |
-| `actions/checkout_action.php` | POST | Validate delivery details and prepare payment |
+| `actions/checkout_action.php` | POST | Validate delivery details, courier and Pro discount, and prepare payment |
 | `actions/process_payment_action.php` | GET | Verify the Paystack payment and create the order |
+| `actions/process_pro_payment_action.php` | GET | Verify a Packe Pro payment and add 30 days of membership |
 
 ### Accounts
 
@@ -421,6 +468,7 @@ Every `POST` endpoint requires a valid CSRF token. Most redirect back with a mes
 | `actions/add_category_action.php` / `update_category_action.php` | POST | Add or rename a category |
 | `actions/update_order_status_action.php` | POST | Change an order's status |
 | `actions/assign_delivery_action.php` | POST | Assign a rider to an order |
+| `actions/book_partner_action.php` | POST | Save the Uber, Yango or Bolt driver for a partner delivery |
 | `actions/add_business_action.php` / `update_business_action.php` | POST | Add or edit an account |
 | `actions/update_business_role_action.php` | POST | Change an account's role |
 | `actions/delete_business_action.php` | POST | Delete an account with no orders |
@@ -438,8 +486,10 @@ Every `POST` endpoint requires a valid CSRF token. Most redirect back with a mes
 | Session hijacking | New session ID at login; HttpOnly, SameSite and Secure cookies | `core/core.php` |
 | Script injection (XSS) | All output is escaped with `e()` (`htmlspecialchars`) | Every view |
 | Wrong role | `require_login()`, `require_admin()`, `require_delivery()`; the role is re-read from the database on every page | `core/core.php` |
-| Payment tampering | Amount, currency and reference are verified with Paystack's API on the server | `controllers/OrderController.php` |
-| Harmful uploads | Real file type checked with `finfo`, size limits, random file names | `save_uploaded_image()` |
+| Payment tampering | Amount, currency and reference are verified with Paystack's API on the server, for orders and Packe Pro | `controllers/PaystackGateway.php` |
+| Price tampering | Design prices, delivery fees, courier booking fees and Pro discounts are worked out again on the server | `OrderController::prepareCheckout()` |
+| Unsafe links | Partner tracking links must be full `https://` links | `DeliveryController::bookPartner()` |
+| Harmful uploads | Real file type checked with `finfo`, size limits, random file names; SVG and scripts blocked in `images/` | `save_uploaded_image()`, `images/.htaccess` |
 | Leaked keys | Keys live in environment variables or the git-ignored `core/local_cred.php` | `core/db_cred.php` |
 
 ---
@@ -451,7 +501,7 @@ Every `POST` endpoint requires a valid CSRF token. Most redirect back with a mes
 | Hagen Dickson | User management and authentication, product catalogue, admin business accounts |
 | Josephine Allan | 3D packaging designer, customisation and pricing, CMS version |
 | Donna Omaboe | Shopping cart, checkout and Paystack payment |
-| Eyram-Makafui Awoye | Order management, delivery management and pricing, administration, Google sign-in |
+| Eyram-Makafui Awoye | Order management, delivery management, pricing and partners, administration and analytics, Packe Pro, Google sign-in |
 
 ---
 
@@ -468,6 +518,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - [Leaflet](https://leafletjs.com/) and [OpenStreetMap](https://www.openstreetmap.org/) contributors for maps
 - [Paystack](https://paystack.com/) for payments
 - [Tailwind CSS](https://tailwindcss.com/) for styling
+- [Chart.js](https://www.chartjs.org/) for the admin charts
+- Uber, Yango and Bolt logos belong to their owners and are used here for a class demonstration only
 
 ---
 
