@@ -31,7 +31,13 @@ class ProController
     {
         if ($customerId <= 0) return null;
         if (!array_key_exists($customerId, self::$activeCache)) {
-            self::$activeCache[$customerId] = $this->model->getActive($customerId);
+            try {
+                self::$activeCache[$customerId] = $this->model->getActive($customerId);
+            } catch (mysqli_sql_exception $e) {
+                // e.g. setup.php hasn't added the subscriptions table yet: treat as "not a member" instead of breaking every page
+                log_error('Packe Pro lookup failed (run setup.php?): ' . $e->getMessage());
+                self::$activeCache[$customerId] = null;
+            }
         }
         return self::$activeCache[$customerId];
     }

@@ -6,7 +6,7 @@ CREATE DATABASE IF NOT EXISTS packe CHARACTER SET utf8mb4 COLLATE utf8mb4_unicod
 USE packe;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS social_logins, deliveries, payments, order_items, orders, cart, customizations, products, categories, customers;
+DROP TABLE IF EXISTS subscriptions, social_logins, deliveries, payments, order_items, orders, cart, customizations, products, categories, customers;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- user_role: 1 = admin, 2 = customer (default), 3 = delivery staff
