@@ -40,6 +40,12 @@ class CustomerClass extends Database
         );
     }
 
+    /** The few details the session keeps, read fresh on each page so role changes and deletions apply at once. */
+    public function getSessionInfo(int $id): ?array
+    {
+        return $this->fetchOne('SELECT full_name, email, user_role FROM customers WHERE customer_id = ?', 'i', [$id]);
+    }
+
     /** Returns the customer row (without the password hash) or null. Google-only accounts (no password) can't log in this way. */
     public function login(string $email, string $password): ?array
     {

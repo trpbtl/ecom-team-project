@@ -51,7 +51,7 @@ require __DIR__ . '/layout/header.php';
     <!-- 3D stage -->
     <section class="lg:sticky lg:top-24 rounded-2xl border border-line overflow-hidden relative h-[60vh] lg:h-[calc(100vh-8rem)] min-h-[420px] bg-[radial-gradient(ellipse_at_50%_40%,#ffffff_0%,#e9e3d9_100%)]" aria-label="Preview">
         <canvas id="gl" class="absolute inset-0 w-full h-full touch-none cursor-grab" aria-label="3D preview of your <?= e($t['noun'][0]) ?>"></canvas>
-        <div id="dieline" class="absolute inset-0 bg-white p-6 pt-16 flex flex-col gap-3" hidden>
+        <div id="dieline" class="absolute inset-0 bg-surface p-6 pt-16 flex flex-col gap-3" hidden>
             <svg id="dieSvg" class="flex-1 w-full min-h-0" role="img" aria-label="Flat print layout"></svg>
             <p class="text-sm text-muted flex flex-wrap gap-5">
                 <span><i class="inline-block w-7 align-middle border-t-2 border-ink mr-1"></i>Cut line</span>
@@ -60,10 +60,10 @@ require __DIR__ . '/layout/header.php';
             </p>
         </div>
         <div class="absolute left-4 top-4 flex gap-1 rounded-full bg-sand p-1 text-sm font-semibold" role="group" aria-label="Preview mode">
-            <button type="button" id="tab3d" aria-pressed="true" class="rounded-full px-4 py-1.5 aria-pressed:bg-white aria-pressed:shadow">3D</button>
-            <button type="button" id="tab2d" aria-pressed="false" class="rounded-full px-4 py-1.5 aria-pressed:bg-white aria-pressed:shadow">Flat layout</button>
+            <button type="button" id="tab3d" aria-pressed="true" class="rounded-full px-4 py-1.5 aria-pressed:bg-surface aria-pressed:shadow">3D</button>
+            <button type="button" id="tab2d" aria-pressed="false" class="rounded-full px-4 py-1.5 aria-pressed:bg-surface aria-pressed:shadow">Flat layout</button>
         </div>
-        <div id="foldbar" class="absolute left-4 right-4 bottom-4 flex flex-wrap items-center gap-3 rounded-xl bg-white/95 border border-line p-3 shadow">
+        <div id="foldbar" class="absolute left-4 right-4 bottom-4 flex flex-wrap items-center gap-3 rounded-xl bg-surface/95 border border-line p-3 shadow">
             <?php if ($t['folds']): ?>
                 <div class="flex gap-1" id="foldButtons">
                     <button type="button" class="btn btn-ghost !py-1.5 !px-3 text-sm" data-fold="0">Flat</button>
@@ -143,7 +143,7 @@ require __DIR__ . '/layout/header.php';
             <div class="grid grid-cols-5 gap-2 mt-2" id="patterns">
                 <label class="pattern-chip" title="No pattern">
                     <input type="radio" name="pattern" value="" checked class="sr-only">
-                    <span class="pattern-swatch grid place-items-center text-xs font-semibold text-muted bg-white">None</span>
+                    <span class="pattern-swatch grid place-items-center text-xs font-semibold text-muted bg-surface">None</span>
                 </label>
                 <?php foreach (DesignTypes::PATTERNS as $key => $name): ?>
                     <label class="pattern-chip" title="<?= e($name) ?>">

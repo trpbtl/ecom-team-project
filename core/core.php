@@ -244,6 +244,31 @@ function is_delivery(): bool
     return is_logged_in() && (int) ($_SESSION['user_role'] ?? 0) === ROLE_DELIVERY;
 }
 
+/**
+ * Re-read the logged-in account on every page. The role is cached in the session at login, so without this an admin
+ * who was demoted (or an account that was deleted) on the Businesses page would keep their old access until they log out.
+ */
+function refresh_session_user(): void
+{
+    if (!is_logged_in()) return;
+    require_once APP_ROOT . '/classes/CustomerClass.php';
+    try {
+        $row = (new CustomerClass())->getSessionInfo((int) $_SESSION['customer_id']);
+    } catch (Throwable $e) {
+        log_error('Could not refresh session user: ' . $e->getMessage());
+        return;   // keep the session as it is rather than break the page
+    }
+    if ($row === null) {   // the account was deleted: log out
+        $_SESSION = [];
+        session_regenerate_id(true);
+        flash('error', 'Your account is no longer active. Please contact Packe if this is a mistake.');
+        return;
+    }
+    $_SESSION['user_role'] = (int) $row['user_role'];
+    $_SESSION['customer_name'] = $row['full_name'];
+    $_SESSION['customer_email'] = $row['email'];
+}
+
 function require_login(): void
 {
     if (!is_logged_in()) {
@@ -321,3 +346,6 @@ function save_uploaded_image(string $field, string $folder, int $maxBytes = 2097
     }
     return $name;
 }
+
+/* ---------- Keep the session's role in step with the database (see refresh_session_user) ---------- */
+refresh_session_user();

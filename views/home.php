@@ -19,7 +19,7 @@ require __DIR__ . '/layout/header.php';
 <!-- Hero: one line of promise, and live 3D packaging that shows it -->
 <section class="grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-4 items-center -mt-2">
     <div class="flex flex-col gap-6 order-2 lg:order-1">
-        <p class="inline-flex self-start items-center gap-2 rounded-full bg-white border border-line px-3 py-1.5 text-sm">
+        <p class="inline-flex self-start items-center gap-2 rounded-full bg-surface border border-line px-3 py-1.5 text-sm">
             <span class="w-2 h-2 rounded-full bg-packe-500"></span> Custom packaging, made in Ghana
         </p>
         <h1 class="font-display font-extrabold text-5xl md:text-7xl leading-[0.95] tracking-tight">
@@ -44,11 +44,11 @@ require __DIR__ . '/layout/header.php';
                     data-showcase='<?= e(json_encode($showcase)) ?>'
                     aria-label="Custom packaging turning in 3D: mailer box, food box, pouch, carton, catalogue and sticker"></canvas>
             <!-- floating details -->
-            <div class="absolute left-4 top-4 md:left-6 md:top-6 rounded-2xl bg-white/90 backdrop-blur px-4 py-3 shadow-sm">
+            <div class="absolute left-4 top-4 md:left-6 md:top-6 rounded-2xl bg-surface/90 backdrop-blur px-4 py-3 shadow-sm">
                 <p class="text-xs text-muted" id="hero-type">Custom mailer box</p>
                 <p class="font-display font-extrabold text-xl tabular-nums" id="hero-price">from <?= e($showcase['mailer']['from']) ?></p>
             </div>
-            <div id="hero-look" class="absolute right-4 bottom-4 md:right-6 md:bottom-6 flex items-center gap-2 rounded-full bg-white/90 backdrop-blur pl-2 pr-4 py-2 shadow-sm text-sm">
+            <div id="hero-look" class="absolute right-4 bottom-4 md:right-6 md:bottom-6 flex items-center gap-2 rounded-full bg-surface/90 backdrop-blur pl-2 pr-4 py-2 shadow-sm text-sm">
                 <span data-swatch class="w-6 h-6 rounded-full border border-black/10" style="background:#d14615"></span>
                 <span data-name>Kraft · Packe orange</span>
             </div>
@@ -115,7 +115,7 @@ require __DIR__ . '/layout/header.php';
         <h2 class="font-display font-extrabold text-3xl md:text-4xl">Your box. Your brand.</h2>
         <p class="text-white/80 mt-2">See it in 3D before you pay a pesewa.</p>
     </div>
-    <a href="<?= url('views/customize.php') ?>" class="btn bg-white text-packe-700 hover:bg-cream !px-6 !py-3.5 text-base">Start designing</a>
+    <a href="<?= url('views/customize.php') ?>" class="btn bg-surface text-packe-700 hover:bg-cream !px-6 !py-3.5 text-base">Start designing</a>
 </section>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>
