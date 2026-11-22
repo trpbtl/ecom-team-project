@@ -7,6 +7,8 @@ $pro = new ProController();
 $me = (int) ($_SESSION['customer_id'] ?? 0);
 $active = $pro->getActive($me);
 $history = $me ? $pro->getHistory($me) : [];
+// How many free standard deliveries (each at least the base fee) cover the monthly price: 99 / 25 → 4
+$breakEvenDeliveries = (int) ceil(ProController::PRICE / DELIVERY_BASE);
 
 // A fresh reference for this visit's payment, checked again on the server after Paystack
 if ($me && PAYSTACK_PUBLIC_KEY !== '') {
@@ -46,8 +48,9 @@ require __DIR__ . '/layout/header.php';
     <?php else: ?>
         <div>
             <p class="label">Is it worth it?</p>
-            <p class="font-display font-bold text-2xl mt-1">Pro pays for itself from about <?= money(ProController::PRICE / ProController::DISCOUNT_RATE) ?> of packaging a month</p>
-            <p class="text-muted text-sm">Or sooner: a single standard delivery is <?= money(DELIVERY_BASE) ?> or more.</p>
+            <p class="font-display font-bold text-2xl mt-1">Pro pays for itself with <?= $breakEvenDeliveries ?> deliveries a month</p>
+            <p class="text-muted text-sm">Every standard delivery costs at least GH₵<?= number_format(DELIVERY_BASE, 0) ?>, so <?= $breakEvenDeliveries ?> free ones already cover the <?= money(ProController::PRICE) ?>.
+                Or spend about GH₵<?= number_format(ProController::PRICE / ProController::DISCOUNT_RATE, 0) ?> a month on packaging and the 10% discount covers it on its own.</p>
         </div>
     <?php endif; ?>
 

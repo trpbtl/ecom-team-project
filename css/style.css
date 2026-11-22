@@ -295,3 +295,7 @@ html.dark img[src$="logo.svg"] { filter: drop-shadow(0 0 1px rgba(255,255,255,.2
 .courier-logo { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: .6rem; display: block; }
 .courier-chip { display: inline-flex; align-items: center; gap: .5rem; }
 .courier-chip img { width: 42px; height: 28px; object-fit: cover; border-radius: .3rem; }
+
+/* Paystack's payment window is a light-themed iframe. In dark mode Chrome would paint its see-through backdrop
+   solid white (the colour schemes don't match), so embedded windows are told they are light. */
+html.dark iframe { color-scheme: light; }
