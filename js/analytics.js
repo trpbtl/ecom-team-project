@@ -48,6 +48,26 @@
                    tooltip: { callbacks: { label: c => `${c.label}: ${fmt(c.raw)}` } } } }
     }));
     doughnut('chart-streams', data.streams.labels, data.streams.values, money);
+
+    // Smaller revenue streams per day, stacked, on their own scale
+    const beyondColours = ['#2563eb', '#16a34a', '#a855f7', '#f59e0b'];
+    if (document.getElementById('chart-beyond')) {
+      charts.push(new Chart(document.getElementById('chart-beyond'), {
+        type: 'bar',
+        data: {
+          labels: data.beyond.labels,
+          datasets: Object.entries(data.beyond.series).map(([label, values], i) => ({
+            label, data: values, backgroundColor: beyondColours[i], borderRadius: 3, stack: 'income'
+          }))
+        },
+        options: {
+          maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          scales: { x: { stacked: true, ticks: { maxTicksLimit: 10 } }, y: { stacked: true, beginAtZero: true, ticks: { callback: v => 'GH₵' + v } } },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } },
+                     tooltip: { callbacks: { label: c => `${c.dataset.label}: ${money(c.raw)}` } } }
+        }
+      }));
+    }
     doughnut('chart-status', data.statuses.labels, data.statuses.values, v => `${v} orders`);
   }
 

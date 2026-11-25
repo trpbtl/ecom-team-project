@@ -54,6 +54,37 @@ class AnalyticsClass extends Database
         );
     }
 
+    /**
+     * Delivery income per day for the smaller revenue streams: all delivery fees, the express part of them
+     * (without partner booking fees), and how many deliveries were booked with Uber, Yango or Bolt.
+     * $days = 0 means all time (one row per day).
+     */
+    public function deliveryIncomeByDay(int $days, float $partnerFee): array
+    {
+        return $this->fetchAll(
+            "SELECT DATE(o.created_at) AS day,
+                    COALESCE(SUM(d.delivery_fee), 0) AS fees,
+                    COALESCE(SUM(CASE WHEN d.delivery_option = 'express'
+                                      THEN d.delivery_fee - IF(d.carrier <> 'packe', ?, 0) ELSE 0 END), 0) AS express_fees,
+                    COALESCE(SUM(d.carrier <> 'packe'), 0) AS partner_count
+             FROM orders o JOIN deliveries d ON d.order_id = o.order_id
+             WHERE " . self::LIVE . " AND (? = 0 OR o.created_at >= CURDATE() - INTERVAL ? DAY)
+             GROUP BY DATE(o.created_at) ORDER BY day",
+            'dii', [$partnerFee, $days, max(0, $days - 1)]
+        );
+    }
+
+    /** Packe Pro membership payments per day. */
+    public function membershipsByDay(int $days): array
+    {
+        return $this->fetchAll(
+            'SELECT DATE(created_at) AS day, SUM(amount) AS amount FROM subscriptions
+             WHERE (? = 0 OR created_at >= CURDATE() - INTERVAL ? DAY)
+             GROUP BY DATE(created_at) ORDER BY day',
+            'ii', [$days, max(0, $days - 1)]
+        );
+    }
+
     public function ordersByStatus(): array
     {
         return $this->fetchAll('SELECT order_status AS status, COUNT(*) AS n FROM orders GROUP BY order_status');

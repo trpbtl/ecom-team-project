@@ -15,6 +15,7 @@ $chartData = [
     'daily'    => ['labels' => array_map(fn($d) => date('j M', strtotime($d['day'])), $a['daily']),
                    'revenue' => array_column($a['daily'], 'revenue'), 'orders' => array_column($a['daily'], 'orders')],
     'streams'  => ['labels' => array_keys($a['streams']), 'values' => array_values($a['streams'])],
+    'beyond'   => ['labels' => array_map(fn($d) => date('j M', strtotime($d['day'])), $a['daily']), 'series' => $a['beyond']],
     'statuses' => ['labels' => array_map(fn($s) => OrderController::statusLabel($s['status']), $a['statuses']),
                    'values' => array_map('intval', array_column($a['statuses'], 'n'))],
 ];
@@ -55,12 +56,28 @@ require __DIR__ . '/../layout/header.php';
         <div class="chart-box mt-3" style="height:200px"><canvas id="chart-streams" aria-label="Income by revenue stream"></canvas></div>
         <ul class="mt-3 text-sm flex flex-col gap-1">
             <?php foreach ($a['streams'] as $name => $value): ?>
-                <li class="flex justify-between gap-3"><span><?= e($name) ?></span><span class="tabular-nums font-semibold"><?= money($value) ?></span></li>
+                <li class="flex justify-between gap-3"><span><?= e($name) ?> <span class="text-muted text-xs tabular-nums"><?= $a['shares'][$name] ?>%</span></span><span class="tabular-nums font-semibold"><?= money($value) ?></span></li>
             <?php endforeach; ?>
             <?php if ($o['discounts'] > 0): ?><li class="flex justify-between gap-3 text-muted"><span>Pro discounts given</span><span class="tabular-nums">−<?= money($o['discounts']) ?></span></li><?php endif; ?>
         </ul>
     </section>
 </div>
+
+<!-- The smaller revenue streams on their own scale, so they aren't hidden behind packaging sales -->
+<section class="card p-6 mt-6">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+            <h2 class="font-display font-bold text-lg">Beyond packaging sales, last <?= $days ?> days</h2>
+            <p class="text-sm text-muted">Delivery, express, partner bookings and Packe Pro: the revenue streams on top of selling packaging.</p>
+        </div>
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            <?php foreach ($a['beyondTotals'] as $name => $value): ?>
+                <span><?= e($name) ?>: <b class="tabular-nums"><?= money($value) ?></b></span>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div class="chart-box mt-4"><canvas id="chart-beyond" aria-label="Delivery fees, express premium, partner booking fees and Packe Pro memberships per day"></canvas></div>
+</section>
 
 <div class="grid lg:grid-cols-3 gap-6 mt-6">
     <section class="card p-6">
