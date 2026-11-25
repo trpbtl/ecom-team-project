@@ -191,3 +191,12 @@ INSERT INTO products (category_id, name, description, material, base_price, keyw
 --   UPDATE customers SET user_role = 1 WHERE email = 'you@example.com';
 -- To make a delivery staff account:
 --   UPDATE customers SET user_role = 3 WHERE email = 'rider@example.com';
+
+-- Packe's own delivery riders (role 3), ready to assign. No passwords: an admin can set one in Admin → Businesses.
+INSERT INTO customers (full_name, email, password_hash, phone, business_name, city, address, user_role) VALUES
+('Kofi Boateng',  'kofi.boateng@riders.packe.test',  NULL, '0241000101', 'Packe Delivery', 'Madina',     '', 3),
+('Yaw Asante',    'yaw.asante@riders.packe.test',    NULL, '0541000102', 'Packe Delivery', 'East Legon', '', 3),
+('Kwabena Ofori', 'kwabena.ofori@riders.packe.test', NULL, '0201000103', 'Packe Delivery', 'Tema',       '', 3),
+('Akosua Darko',  'akosua.darko@riders.packe.test',  NULL, '0551000104', 'Packe Delivery', 'Spintex',    '', 3),
+('Kojo Appiah',   'kojo.appiah@riders.packe.test',   NULL, '0271000105', 'Packe Delivery', 'Kasoa',      '', 3),
+('Abena Mensah',  'abena.mensah@riders.packe.test',  NULL, '0501000106', 'Packe Delivery', 'Dansoman',   '', 3);

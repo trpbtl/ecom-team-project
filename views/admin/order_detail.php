@@ -78,7 +78,7 @@ require __DIR__ . '/../layout/header.php';
             <input type="hidden" name="order_id" value="<?= (int) $order['order_id'] ?>">
             <label class="field"><span class="label">Delivery rider</span>
                 <?php if (!$staff): ?>
-                    <span class="text-sm text-muted">No delivery staff yet. Give an account role 3 in the database (see README).</span>
+                    <span class="text-sm text-muted">No riders yet. <a href="<?= url('views/admin/riders.php') ?>" class="text-packe-600 hover:underline">Add one on the Riders page</a>.</span>
                 <?php else: ?>
                     <select name="staff_id" class="input">
                         <option value="">Choose…</option>
@@ -88,6 +88,7 @@ require __DIR__ . '/../layout/header.php';
                     </select>
                 <?php endif; ?></label>
             <?php if ($staff): ?><button class="btn btn-dark">Assign rider</button><?php endif; ?>
+            <a href="<?= url('views/admin/riders.php') ?>" class="text-sm text-packe-600 hover:underline">Manage riders →</a>
         </form>
         <?php endif; ?>
 

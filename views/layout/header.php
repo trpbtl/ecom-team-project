@@ -87,6 +87,7 @@ function nav_class(string $file, string $here): string
                 <a href="<?= url('views/admin/product.php') ?>" class="<?= nav_class('product.php', $__here) ?>">Products</a>
                 <a href="<?= url('views/admin/category.php') ?>" class="<?= nav_class('category.php', $__here) ?>">Categories</a>
                 <a href="<?= url('views/admin/businesses.php') ?>" class="<?= nav_class('businesses.php', $__here) ?>">Businesses</a>
+                <a href="<?= url('views/admin/riders.php') ?>" class="<?= nav_class('riders.php', $__here) ?>">Riders</a>
                 <a href="<?= url('views/admin/analytics.php') ?>" class="<?= nav_class('analytics.php', $__here) ?>">Analytics</a>
             <?php endif; ?>
             <?php if (is_delivery()): ?>

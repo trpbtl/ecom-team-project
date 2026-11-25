@@ -173,5 +173,25 @@ function upgrade(mysqli $c): string
                    ADD COLUMN tracking_url VARCHAR(255) NULL AFTER driver_phone");
         $done[] = 'added delivery partners (Uber, Yango, Bolt)';
     }
+    // Packe's own riders, so orders can be assigned straight away. No passwords: an admin sets one in Businesses if a rider needs to log in.
+    $riders = [
+        ['Kofi Boateng',   'kofi.boateng@riders.packe.test',   '0241000101', 'Madina'],
+        ['Yaw Asante',     'yaw.asante@riders.packe.test',     '0541000102', 'East Legon'],
+        ['Kwabena Ofori',  'kwabena.ofori@riders.packe.test',  '0201000103', 'Tema'],
+        ['Akosua Darko',   'akosua.darko@riders.packe.test',   '0551000104', 'Spintex'],
+        ['Kojo Appiah',    'kojo.appiah@riders.packe.test',    '0271000105', 'Kasoa'],
+        ['Abena Mensah',   'abena.mensah@riders.packe.test',   '0501000106', 'Dansoman'],
+    ];
+    $st = $c->prepare("INSERT INTO customers (full_name, email, password_hash, phone, business_name, city, address, user_role)
+                       SELECT ?, ?, NULL, ?, 'Packe Delivery', ?, '', 3 FROM DUAL
+                       WHERE NOT EXISTS (SELECT 1 FROM customers WHERE email = ?)");
+    $added = 0;
+    foreach ($riders as [$name, $email, $phone, $area]) {
+        $st->bind_param('sssss', $name, $email, $phone, $area, $email);
+        $st->execute();
+        $added += $st->affected_rows;
+    }
+    $st->close();
+    if ($added) $done[] = "added $added Packe riders";
     return $done ? 'Upgraded: ' . implode('; ', $done) . '.' : 'Nothing needed changing.';
 }

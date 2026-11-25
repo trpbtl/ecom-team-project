@@ -44,6 +44,34 @@ class DeliveryController
         return ['success' => true, 'name' => $name];
     }
 
+    public function getRiders(): array
+    {
+        return $this->model->getRidersWithStats();
+    }
+
+    public function getUnassigned(): array
+    {
+        return $this->model->getUnassigned();
+    }
+
+    /** Add a Packe rider from the admin Riders page: name, phone and the area they usually cover. */
+    public function addRider(array $in): array
+    {
+        $name = Validate::clean($in['full_name'] ?? '');
+        $phone = Validate::clean($in['phone'] ?? '');
+        $area = Validate::clean($in['area'] ?? '');
+        if (!Validate::text($name, 2, 100)) return Validate::fail('Enter the rider’s full name.');
+        if (!Validate::phone($phone))       return Validate::fail('Enter the rider’s phone number (7 to 15 digits).');
+        if (!Validate::text($area, 2, 60))  return Validate::fail('Enter the area the rider usually covers.');
+        // Riders don't need an email to be assigned; give each a unique internal one (an admin can change it in Businesses)
+        $slug = trim(preg_replace('/[^a-z0-9]+/', '.', strtolower($name)), '.') ?: 'rider';
+        do {
+            $email = $slug . '.' . bin2hex(random_bytes(2)) . '@riders.packe.test';
+        } while ($this->model->riderEmailExists($email));
+        $this->model->addRider($name, $email, $phone, $area);
+        return ['success' => true, 'name' => $name];
+    }
+
     public function getDeliveriesForStaff(int $staffId): array
     {
         return $this->model->getDeliveriesForStaff($staffId);

@@ -28,6 +28,47 @@ class DeliveryClass extends Database
         ) >= 0;
     }
 
+    /** Every rider (role 3) with how many deliveries they have on the go and have completed. */
+    public function getRidersWithStats(): array
+    {
+        return $this->fetchAll(
+            "SELECT c.customer_id, c.full_name, c.phone, c.city, c.email, (c.password_hash IS NOT NULL) AS can_log_in,
+                    COALESCE(SUM(d.status IN ('assigned', 'in_transit')), 0) AS active,
+                    COALESCE(SUM(d.status = 'delivered'), 0) AS delivered
+             FROM customers c LEFT JOIN deliveries d ON d.assigned_to = c.customer_id
+             WHERE c.user_role = 3
+             GROUP BY c.customer_id, c.full_name, c.phone, c.city, c.email, c.password_hash
+             ORDER BY active ASC, c.full_name"
+        );
+    }
+
+    /** Paid orders delivered by Packe riders that nobody has been assigned to yet. */
+    public function getUnassigned(): array
+    {
+        return $this->fetchAll(
+            "SELECT o.order_id, o.invoice_no, o.created_at, d.recipient_name, d.city, d.delivery_option, d.distance_km
+             FROM deliveries d JOIN orders o ON o.order_id = d.order_id
+             WHERE d.assigned_to IS NULL AND d.carrier = 'packe' AND d.status = 'pending' AND o.order_status <> 'cancelled'
+             ORDER BY d.delivery_option = 'express' DESC, o.created_at ASC"
+        );
+    }
+
+    public function riderEmailExists(string $email): bool
+    {
+        return $this->fetchOne('SELECT customer_id FROM customers WHERE email = ?', 's', [$email]) !== null;
+    }
+
+    /** A new rider account (role 3) with no password; an admin can set one later in Businesses. */
+    public function addRider(string $name, string $email, string $phone, string $area): int
+    {
+        $this->execute(
+            "INSERT INTO customers (full_name, email, password_hash, phone, business_name, city, address, user_role)
+             VALUES (?, ?, NULL, ?, 'Packe Delivery', ?, '', 3)",
+            'ssss', [$name, $email, $phone, $area]
+        );
+        return $this->conn->insert_id;
+    }
+
     public function getDeliveriesForStaff(int $staffId): array
     {
         return $this->fetchAll(
