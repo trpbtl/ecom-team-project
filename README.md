@@ -1,6 +1,6 @@
 # Packe: Custom Packaging E-Commerce Platform
 
-A business-to-business (B2B) e-commerce platform where businesses in Ghana design, preview, price, pay for and receive custom packaging online. Built as the team project for CS442 E-Commerce at Ashesi University.
+A business-to-business (B2B) e-commerce platform that allows businesses in Ghana to design, preview, price, pay for and receive custom packaging online. Built as the team project for CS442 E-Commerce at Ashesi University.
 
 **Live site:** [https://packe.onrender.com](https://packe.onrender.com)
 
